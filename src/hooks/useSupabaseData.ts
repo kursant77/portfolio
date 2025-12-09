@@ -160,6 +160,20 @@ export function useContactInfo() {
     if (cached) {
       setContactInfo(cached);
       setLoading(false);
+      // Fetch in background to update cache
+      supabase
+        .from('contact_info')
+        .select('*')
+        .limit(1)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setContactInfo(data);
+            cache.set('contact_info', data);
+          }
+        })
+        .catch((error) => console.error('Error fetching contact info:', error));
+      return;
     }
 
     try {
@@ -197,6 +211,20 @@ export function useCVInfo() {
     if (cached) {
       setCvInfo(cached);
       setLoading(false);
+      // Fetch in background to update cache
+      supabase
+        .from('cv_info')
+        .select('*')
+        .limit(1)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setCvInfo(data);
+            cache.set('cv_info', data);
+          }
+        })
+        .catch((error) => console.error('Error fetching CV info:', error));
+      return;
     }
 
     try {
