@@ -1,35 +1,45 @@
-import React, { useEffect } from 'react';
-import { ThemeProvider } from './contexts/ThemeContext';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import './i18n';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Skills from './components/Skills';
-import Projects from './components/Projects';
-import Services from './components/Services';
-import CV from './components/CV';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+
+// Lazy load components for better performance
+const Home = lazy(() => import('./pages/Home'));
+const AdminLogin = lazy(() => import('./pages/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p className="mt-4 text-gray-600 dark:text-gray-400">Yuklanmoqda...</p>
+    </div>
+  </div>
+);
 
 function App() {
-  useEffect(() => {
-    // Initialize theme on app load
-    const theme = localStorage.getItem('theme') || 'light';
-    document.documentElement.classList.add(theme);
-  }, []);
-
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-        <Navbar />
-        <Hero />
-        <Skills />
-        <Projects />
-        <Services />
-        <CV />
-        <Contact />
-        <Footer />
-      </div>
-    </ThemeProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

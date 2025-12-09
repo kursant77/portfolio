@@ -11,7 +11,6 @@ import {
   Mail,
   Youtube,
 } from "lucide-react";
-import { hr } from "framer-motion/client";
 
 export default function Footer() {
   const { t } = useTranslation();

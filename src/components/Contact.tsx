@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Mail, Phone, Send, Github, MessageSquare, Linkedin } from 'lucide-react';
+import { useContactInfo } from '../hooks/useSupabaseData';
+import { supabase } from '../lib/supabase';
 
 export default function Contact() {
   const { t } = useTranslation();
@@ -11,12 +13,17 @@ export default function Contact() {
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Xabar yuborildi! Tez orada javob beraman.');
-    setFormData({ name: '', email: '', message: '' });
+    try {
+      const { error } = await supabase.from('contact_messages').insert([formData]);
+      if (error) throw error;
+      alert('Xabar yuborildi! Tez orada javob beraman.');
+      setFormData({ name: '', email: '', message: '' });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -26,30 +33,33 @@ export default function Contact() {
     });
   };
 
+  const { contactInfo, loading: contactLoading } = useContactInfo();
+
   const socialLinks = [
     {
       name: 'GitHub',
       icon: <Github className="h-6 w-6" />,
-      url: 'https://github.com',
+      url: contactInfo?.github_url || 'https://github.com',
       color: 'hover:text-gray-900 dark:hover:text-white'
     },
     {
       name: 'Telegram',
       icon: <MessageSquare className="h-6 w-6" />,
-      url: 'https://telegram.org',
+      url: contactInfo?.telegram_url || 'https://telegram.org',
       color: 'hover:text-blue-500'
     },
     {
       name: 'LinkedIn',
       icon: <Linkedin className="h-6 w-6" />,
-      url: 'https://linkedin.com',
+      url: contactInfo?.linkedin_url || 'https://linkedin.com',
       color: 'hover:text-blue-600'
     }
   ];
 
   return (
-    <section id="contact" className="py-20 bg-white dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="contact" className="relative py-20 bg-white dark:bg-gray-900">
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -157,7 +167,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Phone</p>
-                    <p className="text-gray-600 dark:text-gray-400">+998 90 003 37 23</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {contactLoading ? 'Yuklanmoqda...' : (contactInfo?.phone || '+998 90 003 37 23')}
+                    </p>
                   </div>
                 </motion.div>
 
@@ -170,7 +182,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Email</p>
-                    <p className="text-gray-600 dark:text-gray-400">kursant410@gmail.com</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {contactLoading ? 'Yuklanmoqda...' : (contactInfo?.email || 'kursant410@gmail.com')}
+                    </p>
                   </div>
                 </motion.div>
               </div>

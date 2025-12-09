@@ -77,6 +77,34 @@ src/
 - **Uzbek** (UZ) - Default
 - **Russian** (RU)
 
+## 🔐 Admin Panel
+
+Bu loyiha Supabase backend bilan ishlaydigan admin panelga ega. Admin panel orqali barcha ma'lumotlarni boshqarishingiz mumkin.
+
+### Admin Panelga Kirish
+
+1. `/admin/login` sahifasiga kiring
+2. Supabase da yaratilgan admin user email va password bilan kiring
+3. Admin dashboard da quyidagilarni boshqarishingiz mumkin:
+   - **Skills**: Ko'nikmalar qo'shish, tahrirlash, o'chirish
+   - **Projects**: Loyihalar qo'shish, tahrirlash, o'chirish
+   - **Services**: Xizmatlar qo'shish, tahrirlash, o'chirish
+   - **Contact**: Aloqa ma'lumotlarini tahrirlash
+   - **CV**: CV ma'lumotlarini tahrirlash
+
+### Supabase Setup
+
+Batafsil qo'llanma uchun `SUPABASE_SETUP.md` faylini ko'ring.
+
+### Environment Variables
+
+`.env` fayl yarating va quyidagilarni qo'shing:
+
+```
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
 ## 🎨 Customization
 
 ### Adding New Projects
@@ -98,6 +126,27 @@ Create new components in the `src/components/` directory and import them in `App
 - **GitHub**: [GitHub Profile]
 - **Telegram**: [Telegram Profile]
 - **LinkedIn**: [LinkedIn Profile]
+
+## 🚀 Deployment
+
+### Vercel ga Deploy qilish
+
+1. GitHub repository ga push qiling
+2. [Vercel](https://vercel.com) ga kiring va project yarating
+3. Environment variables qo'shing:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. Deploy qiling!
+
+Batafsil qo'llanma uchun `DEPLOYMENT.md` faylini ko'ring.
+
+### Build Command
+
+```bash
+npm run build
+```
+
+Build fayllar `dist` papkasida yaratiladi.
 
 ## 📄 License
 

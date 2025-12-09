@@ -23,7 +23,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 pt-20"
+      className="relative min-h-screen flex items-center justify-center pt-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
     >
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -120,16 +120,13 @@ export default function Hero() {
               <div className=" w-[300px] h-[300px] lg:w-[450px] lg:h-[450px]  bg-gradient-to-br from-blue-400 to-purple-600 rounded-full flex items-center justify-center shadow-2xl overflow-hidden">
                 {/* 👉 Shu yerga rasm qo‘yiladi */}
                 <img
+                  loading="lazy"
                   src="/me.png" // public/me.png faylingni joylashtir
                   alt="Asadbek Jumanazarov"
                   className="w-full h-full object-cover rounded-full"
                 />
               </div>
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-4 border-2 border-dashed border-blue-300 dark:border-blue-500 rounded-full"
-              />
+              <div className="absolute -inset-4 border-2 border-dashed border-blue-300 dark:border-blue-500 rounded-full" />
             </motion.div>
           </motion.div>
         </div>
