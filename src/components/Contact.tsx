@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 import { Mail, Phone, Send, Github, MessageSquare, Linkedin } from 'lucide-react';
 import { useContactInfo } from '../hooks/useSupabaseData';
 import { supabase } from '../lib/supabase';
@@ -15,15 +16,19 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const { error } = await supabase.from('contact_messages').insert([formData]);
-      if (error) throw error;
-      alert('Xabar yuborildi! Tez orada javob beraman.');
-      setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('Xatolik yuz berdi. Iltimos, qayta urinib ko\'ring.');
-    }
+    const submitPromise = supabase.from('contact_messages').insert([formData]);
+    
+    toast.promise(submitPromise, {
+      loading: 'Yuborilmoqda...',
+      success: (result) => {
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+        setFormData({ name: '', email: '', message: '' });
+        return 'Xabar yuborildi! Tez orada javob beraman.';
+      },
+      error: (error) => `Xatolik yuz berdi. Iltimos, qayta urinib ko'ring. ${error?.message || ''}`,
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

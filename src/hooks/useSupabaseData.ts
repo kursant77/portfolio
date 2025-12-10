@@ -24,7 +24,11 @@ export function useSkills() {
             cache.set('skills', data);
           }
         })
-        .catch((error) => console.error('Error fetching skills:', error));
+        .catch((error) => {
+          if (import.meta.env.DEV) {
+            console.error('Error fetching skills:', error);
+          }
+        });
       return;
     }
 
@@ -39,7 +43,9 @@ export function useSkills() {
         cache.set('skills', data);
       }
     } catch (error) {
-      console.error('Error fetching skills:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching skills:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -73,7 +79,11 @@ export function useProjects() {
             cache.set('projects', data);
           }
         })
-        .catch((error) => console.error('Error fetching projects:', error));
+        .catch((error) => {
+          if (import.meta.env.DEV) {
+            console.error('Error fetching projects:', error);
+          }
+        });
       return;
     }
 
@@ -88,7 +98,9 @@ export function useProjects() {
         cache.set('projects', data);
       }
     } catch (error) {
-      console.error('Error fetching projects:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching projects:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -122,7 +134,11 @@ export function useServices() {
             cache.set('services', data);
           }
         })
-        .catch((error) => console.error('Error fetching services:', error));
+        .catch((error) => {
+          if (import.meta.env.DEV) {
+            console.error('Error fetching services:', error);
+          }
+        });
       return;
     }
 
@@ -137,7 +153,9 @@ export function useServices() {
         cache.set('services', data);
       }
     } catch (error) {
-      console.error('Error fetching services:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching services:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -172,7 +190,11 @@ export function useContactInfo() {
             cache.set('contact_info', data);
           }
         })
-        .catch((error) => console.error('Error fetching contact info:', error));
+        .catch((error) => {
+          if (import.meta.env.DEV) {
+            console.error('Error fetching contact info:', error);
+          }
+        });
       return;
     }
 
@@ -188,7 +210,9 @@ export function useContactInfo() {
         cache.set('contact_info', data);
       }
     } catch (error) {
-      console.error('Error fetching contact info:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching contact info:', error);
+      }
     } finally {
       setLoading(false);
     }
@@ -223,7 +247,11 @@ export function useCVInfo() {
             cache.set('cv_info', data);
           }
         })
-        .catch((error) => console.error('Error fetching CV info:', error));
+        .catch((error) => {
+          if (import.meta.env.DEV) {
+            console.error('Error fetching CV info:', error);
+          }
+        });
       return;
     }
 
@@ -239,7 +267,9 @@ export function useCVInfo() {
         cache.set('cv_info', data);
       }
     } catch (error) {
-      console.error('Error fetching CV info:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error fetching CV info:', error);
+      }
     } finally {
       setLoading(false);
     }

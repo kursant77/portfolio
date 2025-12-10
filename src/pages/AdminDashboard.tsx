@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
@@ -92,12 +93,16 @@ function AdminDashboardContent() {
     try {
       const { data, error } = await supabase.from('skills').select('*').order('created_at', { ascending: false });
       if (error) {
-        console.error('Error fetching skills:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error fetching skills:', error);
+        }
       } else if (data) {
         setSkills(data);
       }
     } catch (error) {
-      console.error('Unexpected error fetching skills:', error);
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching skills:', error);
+      }
     }
   };
 
@@ -105,12 +110,16 @@ function AdminDashboardContent() {
     try {
       const { data, error } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
       if (error) {
-        console.error('Error fetching projects:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error fetching projects:', error);
+        }
       } else if (data) {
         setProjects(data);
       }
     } catch (error) {
-      console.error('Unexpected error fetching projects:', error);
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching projects:', error);
+      }
     }
   };
 
@@ -118,12 +127,16 @@ function AdminDashboardContent() {
     try {
       const { data, error } = await supabase.from('services').select('*').order('created_at', { ascending: false });
       if (error) {
-        console.error('Error fetching services:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error fetching services:', error);
+        }
       } else if (data) {
         setServices(data);
       }
     } catch (error) {
-      console.error('Unexpected error fetching services:', error);
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching services:', error);
+      }
     }
   };
 
@@ -131,12 +144,16 @@ function AdminDashboardContent() {
     try {
       const { data, error } = await supabase.from('contact_info').select('*').limit(1).single();
       if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error fetching contact info:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error fetching contact info:', error);
+        }
       } else if (data) {
         setContactInfo(data);
       }
     } catch (error) {
-      console.error('Unexpected error fetching contact info:', error);
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching contact info:', error);
+      }
     }
   };
 
@@ -144,12 +161,16 @@ function AdminDashboardContent() {
     try {
       const { data, error } = await supabase.from('cv_info').select('*').limit(1).single();
       if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('Error fetching CV info:', error);
+        if (import.meta.env.DEV) {
+          console.error('Error fetching CV info:', error);
+        }
       } else if (data) {
         setCvInfo(data);
       }
     } catch (error) {
-      console.error('Unexpected error fetching CV info:', error);
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching CV info:', error);
+      }
     }
   };
 
@@ -159,22 +180,23 @@ function AdminDashboardContent() {
   };
 
   const handleDelete = async (table: string, id: string) => {
-    if (!confirm('O\'chirishni tasdiqlaysizmi?')) return;
+    const confirmed = window.confirm('O\'chirishni tasdiqlaysizmi?');
+    if (!confirmed) return;
     
-    try {
-      const { error } = await supabase.from(table).delete().eq('id', id);
-      if (error) {
-        console.error(`Error deleting from ${table}:`, error);
-        alert(`O'chirishda xatolik: ${error.message}`);
-      } else {
-        // Clear cache for this table
+    const deletePromise = supabase.from(table).delete().eq('id', id);
+    
+    toast.promise(deletePromise, {
+      loading: 'O\'chirilmoqda...',
+      success: (result) => {
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
         cache.clear(table);
         fetchAllData();
-      }
-    } catch (error: any) {
-      console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
-    }
+        return 'Muvaffaqiyatli o\'chirildi!';
+      },
+      error: (error) => `O'chirishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+    });
   };
 
   if (loading) {
@@ -480,7 +502,7 @@ function SkillsTab({ skills, onRefresh, onDelete }: { skills: Skill[]; onRefresh
 
   const handleSave = async () => {
     if (!formData.name || !formData.icon) {
-      alert('Iltimos, Name va Icon maydonlarini to\'ldiring!');
+      toast.error('Iltimos, Name va Icon maydonlarini to\'ldiring!');
       return;
     }
     
@@ -490,32 +512,44 @@ function SkillsTab({ skills, onRefresh, onDelete }: { skills: Skill[]; onRefresh
       const dataToSave = { ...formData, color: autoColor };
       
       if (editingId) {
-        const { error } = await supabase.from('skills').update(dataToSave).eq('id', editingId);
-        if (error) {
-          console.error('Error updating skill:', error);
-          alert('Skill yangilashda xatolik: ' + error.message);
-        } else {
-          cache.clear('skills');
-          setShowAddModal(false);
-          setEditingId(null);
-          setFormData({ name: '', level: 0, icon: '', color: '' });
-          onRefresh();
-        }
+        const updatePromise = supabase.from('skills').update(dataToSave).eq('id', editingId);
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('skills');
+            setShowAddModal(false);
+            setEditingId(null);
+            setFormData({ name: '', level: 0, icon: '', color: '' });
+            onRefresh();
+            return 'Skill muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `Skill yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       } else {
-        const { error } = await supabase.from('skills').insert([dataToSave]);
-        if (error) {
-          console.error('Error inserting skill:', error);
-          alert('Skill qo\'shishda xatolik: ' + error.message);
-        } else {
-          cache.clear('skills');
-          setShowAddModal(false);
-          setFormData({ name: '', level: 0, icon: '', color: '' });
-          onRefresh();
-        }
+        const insertPromise = supabase.from('skills').insert([dataToSave]);
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('skills');
+            setShowAddModal(false);
+            setFormData({ name: '', level: 0, icon: '', color: '' });
+            onRefresh();
+            return 'Skill muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `Skill qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       }
     } catch (error: any) {
-      console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error:', error);
+      }
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
     }
   };
 
@@ -692,40 +726,52 @@ function ProjectsTab({ projects, onRefresh, onDelete }: { projects: Project[]; o
 
   const handleSave = async () => {
     if (!formData.title_uz || !formData.image) {
-      alert('Iltimos, Title (UZ) va Image maydonlarini to\'ldiring!');
+      toast.error('Iltimos, Title (UZ) va Image maydonlarini to\'ldiring!');
       return;
     }
 
     try {
       if (editingId) {
-        const { error } = await supabase.from('projects').update(formData).eq('id', editingId);
-        if (error) {
-          console.error('Error updating project:', error);
-          alert('Project yangilashda xatolik: ' + error.message);
-        } else {
-          cache.clear('projects');
-          setShowAddModal(false);
-          setEditingId(null);
-          setImagePreview(null);
-          setFormData({ image: '', demo_url: '', github_url: '', title_en: '', title_uz: '', title_ru: '', description_en: '', description_uz: '', description_ru: '' });
-          onRefresh();
-        }
+        const updatePromise = supabase.from('projects').update(formData).eq('id', editingId);
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('projects');
+            setShowAddModal(false);
+            setEditingId(null);
+            setImagePreview(null);
+            setFormData({ image: '', demo_url: '', github_url: '', title_en: '', title_uz: '', title_ru: '', description_en: '', description_uz: '', description_ru: '' });
+            onRefresh();
+            return 'Project muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `Project yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       } else {
-        const { error } = await supabase.from('projects').insert([formData]);
-        if (error) {
-          console.error('Error inserting project:', error);
-          alert('Project qo\'shishda xatolik: ' + error.message);
-        } else {
-          cache.clear('projects');
-          setShowAddModal(false);
-          setImagePreview(null);
-          setFormData({ image: '', demo_url: '', github_url: '', title_en: '', title_uz: '', title_ru: '', description_en: '', description_uz: '', description_ru: '' });
-          onRefresh();
-        }
+        const insertPromise = supabase.from('projects').insert([formData]);
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('projects');
+            setShowAddModal(false);
+            setImagePreview(null);
+            setFormData({ image: '', demo_url: '', github_url: '', title_en: '', title_uz: '', title_ru: '', description_en: '', description_uz: '', description_ru: '' });
+            onRefresh();
+            return 'Project muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `Project qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       }
     } catch (error: any) {
-      console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error:', error);
+      }
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
     }
   };
 
@@ -1007,7 +1053,7 @@ function ServicesTab({ services, onRefresh, onDelete }: { services: Service[]; o
 
   const handleSave = async () => {
     if (!formData.key || !formData.icon || !formData.title_uz) {
-      alert('Iltimos, Key, Icon va Title (UZ) maydonlarini to\'ldiring!');
+      toast.error('Iltimos, Key, Icon va Title (UZ) maydonlarini to\'ldiring!');
       return;
     }
 
@@ -1017,32 +1063,44 @@ function ServicesTab({ services, onRefresh, onDelete }: { services: Service[]; o
       const dataToSave = { ...formData, color: autoColor };
       
       if (editingId) {
-        const { error } = await supabase.from('services').update(dataToSave).eq('id', editingId);
-        if (error) {
-          console.error('Error updating service:', error);
-          alert('Service yangilashda xatolik: ' + error.message);
-        } else {
-          cache.clear('services');
-          setShowAddModal(false);
-          setEditingId(null);
-          setFormData({ key: '', icon: '', color: '', title_en: '', title_uz: '', title_ru: '' });
-          onRefresh();
-        }
+        const updatePromise = supabase.from('services').update(dataToSave).eq('id', editingId);
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('services');
+            setShowAddModal(false);
+            setEditingId(null);
+            setFormData({ key: '', icon: '', color: '', title_en: '', title_uz: '', title_ru: '' });
+            onRefresh();
+            return 'Service muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `Service yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       } else {
-        const { error } = await supabase.from('services').insert([dataToSave]);
-        if (error) {
-          console.error('Error inserting service:', error);
-          alert('Service qo\'shishda xatolik: ' + error.message);
-        } else {
-          cache.clear('services');
-          setShowAddModal(false);
-          setFormData({ key: '', icon: '', color: '', title_en: '', title_uz: '', title_ru: '' });
-          onRefresh();
-        }
+        const insertPromise = supabase.from('services').insert([dataToSave]);
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('services');
+            setShowAddModal(false);
+            setFormData({ key: '', icon: '', color: '', title_en: '', title_uz: '', title_ru: '' });
+            onRefresh();
+            return 'Service muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `Service qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       }
     } catch (error: any) {
-      console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error:', error);
+      }
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
     }
   };
 
@@ -1219,29 +1277,39 @@ function ContactTab({ contactInfo, onRefresh }: { contactInfo: ContactInfo | nul
   const handleSave = async () => {
     try {
       if (contactInfo) {
-        const { error } = await supabase.from('contact_info').update(formData).eq('id', contactInfo.id);
-        if (error) {
-          console.error('Error updating contact info:', error);
-          alert('Contact ma\'lumotlarini yangilashda xatolik: ' + error.message);
-        } else {
-          cache.clear('contact_info');
-          setEditing(false);
-          onRefresh();
-        }
+        const updatePromise = supabase.from('contact_info').update(formData).eq('id', contactInfo.id);
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('contact_info');
+            setEditing(false);
+            onRefresh();
+            return 'Contact ma\'lumotlari muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `Contact ma'lumotlarini yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       } else {
-        const { error } = await supabase.from('contact_info').insert([formData]);
-        if (error) {
-          console.error('Error inserting contact info:', error);
-          alert('Contact ma\'lumotlarini qo\'shishda xatolik: ' + error.message);
-        } else {
-          cache.clear('contact_info');
-          setEditing(false);
-          onRefresh();
-        }
+        const insertPromise = supabase.from('contact_info').insert([formData]);
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('contact_info');
+            setEditing(false);
+            onRefresh();
+            return 'Contact ma\'lumotlari muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `Contact ma'lumotlarini qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       }
     } catch (error: any) {
       console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
     }
   };
 
@@ -1363,14 +1431,14 @@ function CVTab({
 
     // Check if file is PDF
     if (file.type !== 'application/pdf') {
-      alert('Faqat PDF fayl yuklash mumkin!');
+      toast.error('Faqat PDF fayl yuklash mumkin!');
       return;
     }
 
     // Check file size (max 10MB)
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
-      alert('Fayl hajmi 10MB dan katta bo\'lmasligi kerak!');
+      toast.error('Fayl hajmi 10MB dan katta bo\'lmasligi kerak!');
       return;
     }
 
@@ -1390,7 +1458,9 @@ function CVTab({
         });
 
       if (uploadError) {
-        console.error('Upload error:', uploadError);
+        if (import.meta.env.DEV) {
+          console.error('Upload error:', uploadError);
+        }
         let errorMessage = 'Fayl yuklashda xatolik yuz berdi!';
         
         if (uploadError.message.includes('Bucket not found')) {
@@ -1401,7 +1471,7 @@ function CVTab({
           errorMessage = `Fayl yuklashda xatolik: ${uploadError.message}`;
         }
         
-        alert(errorMessage);
+        toast.error(errorMessage);
         setUploading(false);
         return;
       }
@@ -1412,7 +1482,7 @@ function CVTab({
         .getPublicUrl(filePath);
 
       if (!publicUrl) {
-        alert('Fayl URL olishda xatolik!');
+        toast.error('Fayl URL olishda xatolik!');
         setUploading(false);
         return;
       }
@@ -1429,38 +1499,46 @@ function CVTab({
       };
 
       if (cvInfo) {
-        const { error } = await supabase
+        const updatePromise = supabase
           .from('cv_info')
           .update(dataToSave)
           .eq('id', cvInfo.id);
         
-        if (error) {
-          console.error('Database error:', error);
-          alert('Ma\'lumotlar bazasiga saqlashda xatolik: ' + error.message);
-        } else {
-          cache.clear('cv_info');
-          setCvFileUrl(publicUrl);
-          alert('CV fayl muvaffaqiyatli yuklandi!');
-          onRefresh();
-        }
+        toast.promise(updatePromise, {
+          loading: 'Saqlanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('cv_info');
+            setCvFileUrl(publicUrl);
+            onRefresh();
+            return 'CV fayl muvaffaqiyatli yuklandi!';
+          },
+          error: (error) => `Ma'lumotlar bazasiga saqlashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       } else {
-        const { error } = await supabase
+        const insertPromise = supabase
           .from('cv_info')
           .insert([dataToSave]);
         
-        if (error) {
-          console.error('Database error:', error);
-          alert('Ma\'lumotlar bazasiga saqlashda xatolik: ' + error.message);
-        } else {
-          cache.clear('cv_info');
-          setCvFileUrl(publicUrl);
-          alert('CV fayl muvaffaqiyatli yuklandi!');
-          onRefresh();
-        }
+        toast.promise(insertPromise, {
+          loading: 'Saqlanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('cv_info');
+            setCvFileUrl(publicUrl);
+            onRefresh();
+            return 'CV fayl muvaffaqiyatli yuklandi!';
+          },
+          error: (error) => `Ma'lumotlar bazasiga saqlashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       }
     } catch (error: any) {
       console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
     } finally {
       setUploading(false);
     }
@@ -1472,7 +1550,7 @@ function CVTab({
       const fileUrl = cvFileUrl || cvInfo?.cv_file_url || '';
       
       if (!fileUrl && !cvInfo) {
-        alert('Iltimos, avval CV faylni yuklang!');
+        toast.error('Iltimos, avval CV faylni yuklang!');
         return;
       }
 
@@ -1485,36 +1563,46 @@ function CVTab({
       };
 
       if (cvInfo) {
-        const { error } = await supabase
+        const updatePromise = supabase
           .from('cv_info')
           .update(dataToSave)
           .eq('id', cvInfo.id);
         
-        if (error) {
-          console.error('Error updating CV info:', error);
-          alert('CV ma\'lumotlarini yangilashda xatolik: ' + error.message);
-        } else {
-          cache.clear('cv_info');
-          setEditing(false);
-          onRefresh();
-        }
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('cv_info');
+            setEditing(false);
+            onRefresh();
+            return 'CV ma\'lumotlari muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `CV ma'lumotlarini yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       } else {
-        const { error } = await supabase
+        const insertPromise = supabase
           .from('cv_info')
           .insert([dataToSave]);
         
-        if (error) {
-          console.error('Error inserting CV info:', error);
-          alert('CV ma\'lumotlarini qo\'shishda xatolik: ' + error.message);
-        } else {
-          cache.clear('cv_info');
-          setEditing(false);
-          onRefresh();
-        }
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: (result) => {
+            if (result.error) {
+              throw new Error(result.error.message);
+            }
+            cache.clear('cv_info');
+            setEditing(false);
+            onRefresh();
+            return 'CV ma\'lumotlari muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `CV ma'lumotlarini qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
       }
     } catch (error: any) {
       console.error('Unexpected error:', error);
-      alert('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
     }
   };
 

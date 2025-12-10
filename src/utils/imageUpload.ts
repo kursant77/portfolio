@@ -13,7 +13,9 @@ export const uploadImage = async (file: File, folder: string = 'images'): Promis
       .upload(filePath, file);
 
     if (error) {
-      console.error('Upload error:', error);
+      if (import.meta.env.DEV) {
+        console.error('Upload error:', error);
+      }
       // If bucket doesn't exist, return local preview URL
       return getImagePreview(file);
     }
@@ -25,7 +27,9 @@ export const uploadImage = async (file: File, folder: string = 'images'): Promis
 
     return publicUrl;
   } catch (error) {
-    console.error('Image upload error:', error);
+    if (import.meta.env.DEV) {
+      console.error('Image upload error:', error);
+    }
     // Fallback to local preview
     return getImagePreview(file);
   }
