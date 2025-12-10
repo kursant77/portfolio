@@ -1,9 +1,8 @@
 # Vercel ignore file
 # Bu fayllar Vercel ga yuklanmaydi
 
-.env
-.env.local
-.env.*.local
+
+
 node_modules
 dist
 .vscode
