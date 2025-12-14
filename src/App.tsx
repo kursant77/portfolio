@@ -1,6 +1,10 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+<<<<<<< HEAD
 import { Analytics } from "@vercel/analytics/react";
+=======
+import { Toaster } from 'react-hot-toast';
+>>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './i18n';
@@ -39,6 +43,30 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#1f2937',
+              color: '#fff',
+              borderRadius: '8px',
+              padding: '12px 16px',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
       </BrowserRouter>
       <Analytics />
     </AuthProvider>
