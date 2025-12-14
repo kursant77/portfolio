@@ -6,8 +6,8 @@ import { useProjects } from "../hooks/useSupabaseData";
 
 function Projects() {
   const { t, i18n } = useTranslation();
-  const { projects, loading } = useProjects();
-  
+  const { projects, loading, error, refetch } = useProjects();
+
   const currentLanguage = i18n.language || 'uz';
 
   const containerVariants = {
@@ -27,7 +27,7 @@ function Projects() {
 
   return (
     <section id="projects" className="relative py-20 bg-gray-50 dark:bg-gray-800">
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -51,7 +51,19 @@ function Projects() {
           viewport={{ once: true }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {loading ? (
+          {error ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-red-500 mb-4 dark:text-red-400">
+                {currentLanguage === 'uz' ? "Ma'lumotlarni yuklashda xatolik yuz berdi" : "Error loading projects"}
+              </p>
+              <button
+                onClick={refetch}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                {currentLanguage === 'uz' ? "Qayta urinish" : "Retry"}
+              </button>
+            </div>
+          ) : loading ? (
             <div className="col-span-full text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
               <p className="mt-4 text-gray-600 dark:text-gray-400">Yuklanmoqda...</p>
@@ -66,13 +78,13 @@ function Projects() {
               const descKey = `description_${currentLanguage}` as keyof typeof project;
               const title = project[titleKey] as string || project.title_uz || '';
               const description = project[descKey] as string || project.description_uz || '';
-              
+
               return (
                 <motion.div
                   key={project.id}
                   variants={itemVariants}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group"
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group"
                 >
                   <div className="relative group">
                     <img

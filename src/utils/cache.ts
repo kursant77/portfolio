@@ -1,5 +1,5 @@
 // Simple cache utility for Supabase data
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
 interface CacheItem<T> {
   data: T;
