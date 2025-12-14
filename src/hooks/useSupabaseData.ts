@@ -9,33 +9,6 @@ export function useSkills() {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchSkills = useCallback(async () => {
-<<<<<<< HEAD
-=======
-    // Check cache first
-    const cached = cache.get<Skill[]>('skills');
-    if (cached) {
-      setSkills(cached);
-      setLoading(false);
-      // Fetch in background to update cache
-      supabase
-        .from('skills')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setSkills(data);
-            cache.set('skills', data);
-          }
-        })
-        .catch((error) => {
-          if (import.meta.env.DEV) {
-            console.error('Error fetching skills:', error);
-          }
-        });
-      return;
-    }
-
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
     try {
       setLoading(true);
       setError(null);
@@ -46,19 +19,25 @@ export function useSkills() {
         setSkills(cached);
         setLoading(false);
         // Fetch in background to update cache
-        const { data, error: apiError } = await supabase
+        supabase
           .from('skills')
           .select('*')
-          .order('created_at', { ascending: false });
-
-        if (apiError) throw apiError;
-        if (data) {
-          setSkills(data);
-          cache.set('skills', data);
-        }
-        return;
+          .order('created_at', { ascending: false })
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setSkills(data);
+              cache.set('skills', data);
+            }
+          })
+          .catch((err) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching skills in background:', err);
+            }
+          });
+        return; // Return immediately with cached data
       }
 
+      // If no cache, or initial fetch
       const { data, error: apiError } = await supabase
         .from('skills')
         .select('*')
@@ -70,16 +49,11 @@ export function useSkills() {
         setSkills(data);
         cache.set('skills', data);
       }
-<<<<<<< HEAD
     } catch (err) {
-      console.error('Error fetching skills:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch skills'));
-=======
-    } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Error fetching skills:', error);
+        console.error('Error fetching skills:', err);
       }
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
+      setError(err instanceof Error ? err : new Error('Failed to fetch skills'));
     } finally {
       setLoading(false);
     }
@@ -98,33 +72,6 @@ export function useProjects() {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchProjects = useCallback(async () => {
-<<<<<<< HEAD
-=======
-    // Check cache first
-    const cached = cache.get<Project[]>('projects');
-    if (cached) {
-      setProjects(cached);
-      setLoading(false);
-      // Fetch in background to update cache
-      supabase
-        .from('projects')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setProjects(data);
-            cache.set('projects', data);
-          }
-        })
-        .catch((error) => {
-          if (import.meta.env.DEV) {
-            console.error('Error fetching projects:', error);
-          }
-        });
-      return;
-    }
-
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
     try {
       setLoading(true);
       setError(null);
@@ -135,19 +82,25 @@ export function useProjects() {
         setProjects(cached);
         setLoading(false);
         // Fetch in background to update cache
-        const { data, error: apiError } = await supabase
+        supabase
           .from('projects')
           .select('*')
-          .order('created_at', { ascending: false });
-
-        if (apiError) throw apiError;
-        if (data) {
-          setProjects(data);
-          cache.set('projects', data);
-        }
-        return;
+          .order('created_at', { ascending: false })
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setProjects(data);
+              cache.set('projects', data);
+            }
+          })
+          .catch((err) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching projects in background:', err);
+            }
+          });
+        return; // Return immediately with cached data
       }
 
+      // If no cache, or initial fetch
       const { data, error: apiError } = await supabase
         .from('projects')
         .select('*')
@@ -159,16 +112,11 @@ export function useProjects() {
         setProjects(data);
         cache.set('projects', data);
       }
-<<<<<<< HEAD
     } catch (err) {
-      console.error('Error fetching projects:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch projects'));
-=======
-    } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Error fetching projects:', error);
+        console.error('Error fetching projects:', err);
       }
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
+      setError(err instanceof Error ? err : new Error('Failed to fetch projects'));
     } finally {
       setLoading(false);
     }
@@ -187,33 +135,6 @@ export function useServices() {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchServices = useCallback(async () => {
-<<<<<<< HEAD
-=======
-    // Check cache first
-    const cached = cache.get<Service[]>('services');
-    if (cached) {
-      setServices(cached);
-      setLoading(false);
-      // Fetch in background to update cache
-      supabase
-        .from('services')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setServices(data);
-            cache.set('services', data);
-          }
-        })
-        .catch((error) => {
-          if (import.meta.env.DEV) {
-            console.error('Error fetching services:', error);
-          }
-        });
-      return;
-    }
-
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
     try {
       setLoading(true);
       setError(null);
@@ -224,19 +145,25 @@ export function useServices() {
         setServices(cached);
         setLoading(false);
         // Fetch in background to update cache
-        const { data, error: apiError } = await supabase
+        supabase
           .from('services')
           .select('*')
-          .order('created_at', { ascending: false });
-
-        if (apiError) throw apiError;
-        if (data) {
-          setServices(data);
-          cache.set('services', data);
-        }
-        return;
+          .order('created_at', { ascending: false })
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setServices(data);
+              cache.set('services', data);
+            }
+          })
+          .catch((err) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching services in background:', err);
+            }
+          });
+        return; // Return immediately with cached data
       }
 
+      // If no cache, or initial fetch
       const { data, error: apiError } = await supabase
         .from('services')
         .select('*')
@@ -248,16 +175,11 @@ export function useServices() {
         setServices(data);
         cache.set('services', data);
       }
-<<<<<<< HEAD
     } catch (err) {
-      console.error('Error fetching services:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch services'));
-=======
-    } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Error fetching services:', error);
+        console.error('Error fetching services:', err);
       }
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
+      setError(err instanceof Error ? err : new Error('Failed to fetch services'));
     } finally {
       setLoading(false);
     }
@@ -276,34 +198,6 @@ export function useContactInfo() {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchContactInfo = useCallback(async () => {
-<<<<<<< HEAD
-=======
-    // Check cache first
-    const cached = cache.get<ContactInfo>('contact_info');
-    if (cached) {
-      setContactInfo(cached);
-      setLoading(false);
-      // Fetch in background to update cache
-      supabase
-        .from('contact_info')
-        .select('*')
-        .limit(1)
-        .single()
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setContactInfo(data);
-            cache.set('contact_info', data);
-          }
-        })
-        .catch((error) => {
-          if (import.meta.env.DEV) {
-            console.error('Error fetching contact info:', error);
-          }
-        });
-      return;
-    }
-
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
     try {
       setLoading(true);
       setError(null);
@@ -314,20 +208,26 @@ export function useContactInfo() {
         setContactInfo(cached);
         setLoading(false);
         // Fetch in background to update cache
-        const { data, error: apiError } = await supabase
+        supabase
           .from('contact_info')
           .select('*')
           .limit(1)
-          .single();
-
-        if (apiError) throw apiError;
-        if (data) {
-          setContactInfo(data);
-          cache.set('contact_info', data);
-        }
-        return;
+          .single()
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setContactInfo(data);
+              cache.set('contact_info', data);
+            }
+          })
+          .catch((err) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching contact info in background:', err);
+            }
+          });
+        return; // Return immediately with cached data
       }
 
+      // If no cache, or initial fetch
       const { data, error: apiError } = await supabase
         .from('contact_info')
         .select('*')
@@ -340,16 +240,11 @@ export function useContactInfo() {
         setContactInfo(data);
         cache.set('contact_info', data);
       }
-<<<<<<< HEAD
     } catch (err) {
-      console.error('Error fetching contact info:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch contact info'));
-=======
-    } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Error fetching contact info:', error);
+        console.error('Error fetching contact info:', err);
       }
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
+      setError(err instanceof Error ? err : new Error('Failed to fetch contact info'));
     } finally {
       setLoading(false);
     }
@@ -368,34 +263,6 @@ export function useCVInfo() {
   const [error, setError] = useState<Error | null>(null);
 
   const fetchCVInfo = useCallback(async () => {
-<<<<<<< HEAD
-=======
-    // Check cache first
-    const cached = cache.get<CVInfo>('cv_info');
-    if (cached) {
-      setCvInfo(cached);
-      setLoading(false);
-      // Fetch in background to update cache
-      supabase
-        .from('cv_info')
-        .select('*')
-        .limit(1)
-        .single()
-        .then(({ data, error }) => {
-          if (!error && data) {
-            setCvInfo(data);
-            cache.set('cv_info', data);
-          }
-        })
-        .catch((error) => {
-          if (import.meta.env.DEV) {
-            console.error('Error fetching CV info:', error);
-          }
-        });
-      return;
-    }
-
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
     try {
       setLoading(true);
       setError(null);
@@ -406,20 +273,26 @@ export function useCVInfo() {
         setCvInfo(cached);
         setLoading(false);
         // Fetch in background to update cache
-        const { data, error: apiError } = await supabase
+        supabase
           .from('cv_info')
           .select('*')
           .limit(1)
-          .single();
-
-        if (apiError) throw apiError;
-        if (data) {
-          setCvInfo(data);
-          cache.set('cv_info', data);
-        }
-        return;
+          .single()
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setCvInfo(data);
+              cache.set('cv_info', data);
+            }
+          })
+          .catch((err) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching CV info in background:', err);
+            }
+          });
+        return; // Return immediately with cached data
       }
 
+      // If no cache, or initial fetch
       const { data, error: apiError } = await supabase
         .from('cv_info')
         .select('*')
@@ -432,16 +305,11 @@ export function useCVInfo() {
         setCvInfo(data);
         cache.set('cv_info', data);
       }
-<<<<<<< HEAD
     } catch (err) {
-      console.error('Error fetching CV info:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch CV info'));
-=======
-    } catch (error) {
       if (import.meta.env.DEV) {
-        console.error('Error fetching CV info:', error);
+        console.error('Error fetching CV info:', err);
       }
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
+      setError(err instanceof Error ? err : new Error('Failed to fetch CV info'));
     } finally {
       setLoading(false);
     }

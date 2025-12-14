@@ -1,10 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-<<<<<<< HEAD
 import { Analytics } from "@vercel/analytics/react";
-=======
 import { Toaster } from 'react-hot-toast';
->>>>>>> 59da6ca4d660c6e9bc8ba040161ae194dacbc7a8
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import './i18n';
