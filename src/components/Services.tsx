@@ -75,24 +75,34 @@ function Services() {
                 variants={itemVariants}
                 whileHover={{
                   scale: 1.05,
-                  y: -10,
-                  transition: { duration: 0.2 }
+                  y: -15,
+                  transition: { duration: 0.4, ease: "easeOut" }
                 }}
                 itemScope
                 itemType="https://schema.org/Service"
-                className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group"
+                className="relative bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[2.5rem] p-10 border border-white/20 dark:border-gray-700/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-2xl hover:shadow-green-500/10 transition-all duration-500 group overflow-hidden"
               >
-                <div className={`inline-flex p-4 rounded-xl bg-gradient-to-r ${service.color} text-white mb-6`}>
-                  {getIcon(service.icon || 'Code')}
-                </div>
+                {/* Modern Decorative Accent */}
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${service.color} opacity-0 group-hover:opacity-10 rounded-bl-full transition-opacity duration-500`} />
 
-                <h3 itemProp="serviceType" className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                <motion.div
+                  animate={{ rotate: [0, 5, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className={`relative inline-flex p-5 rounded-3xl bg-gradient-to-br ${service.color} text-white mb-8 shadow-xl shadow-green-500/20 transform group-hover:scale-110 transition-transform duration-500`}
+                >
+                  {getIcon(service.icon || 'Code')}
+                </motion.div>
+
+                <h3 itemProp="serviceType" className="text-2xl font-black text-gray-900 dark:text-white mb-6 tracking-tight">
                   {getTitle(service)}
                 </h3>
 
-                <p itemProp="description" className="text-gray-600 dark:text-gray-400">
+                <p itemProp="description" className="text-lg text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
                   {t(`services.${service.key}.description`, { defaultValue: '' })}
                 </p>
+
+                {/* Bottom Bar Accent */}
+                <div className={`absolute bottom-0 left-0 h-1.5 bg-gradient-to-r ${service.color} w-0 group-hover:w-full transition-all duration-700`} />
               </motion.div>
             ))}
           </motion.div>

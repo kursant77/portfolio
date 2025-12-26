@@ -26,7 +26,7 @@ function Projects() {
   };
 
   return (
-    <section id="projects" className="relative py-20 bg-gray-50 dark:bg-gray-800">
+    <section id="projects" className="relative py-24 bg-transparent dark:bg-gray-900">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
@@ -83,75 +83,66 @@ function Projects() {
                 <motion.div
                   key={project.id}
                   variants={itemVariants}
-                  whileHover={{ y: -10, scale: 1.02 }}
+                  whileHover={{ y: -15, scale: 1.02 }}
                   itemScope
                   itemType="https://schema.org/CreativeWork"
-                  className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group"
+                  className="bg-white/40 dark:bg-gray-900/40 backdrop-blur-xl rounded-3xl overflow-hidden shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-2xl border border-white/20 dark:border-gray-700/30 transition-all duration-500 group"
                 >
-                  <div className="relative group">
+                  <div className="relative overflow-hidden aspect-video">
                     <img
                       loading="lazy"
                       itemProp="image"
                       src={project.image}
                       alt={title}
-                      className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 border-b border-white/10">
                       <div className="flex space-x-4">
                         <motion.a
-                          whileHover={{ scale: 1.1 }}
+                          whileHover={{ scale: 1.1, y: -2 }}
                           whileTap={{ scale: 0.9 }}
                           href={project.demo_url}
                           itemProp="url"
-                          className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                          className="p-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 shadow-xl transition-all font-bold flex items-center gap-2"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
                           <ExternalLink className="h-5 w-5" />
+                          <span>Demo</span>
                         </motion.a>
                         <motion.a
-                          whileHover={{ scale: 1.1 }}
+                          whileHover={{ scale: 1.1, y: -2 }}
                           whileTap={{ scale: 0.9 }}
                           href={project.github_url}
-                          className="p-3 bg-gray-800 text-white rounded-full hover:bg-gray-900 transition-colors"
+                          className="p-4 bg-gray-800/80 backdrop-blur-md text-white rounded-2xl hover:bg-gray-900 shadow-xl transition-all font-bold flex items-center gap-2"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
                           <Github className="h-5 w-5" />
+                          <span>Code</span>
                         </motion.a>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-6">
-                    <h3 itemProp="name" className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                  <div className="p-8">
+                    <h3 itemProp="name" className="text-2xl font-black text-gray-900 dark:text-white mb-4 tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {title}
                     </h3>
-                    <p itemProp="description" className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p itemProp="description" className="text-gray-600 dark:text-gray-400 mb-8 line-clamp-3 leading-relaxed font-medium">
                       {description}
                     </p>
 
-                    <div className="flex space-x-3">
-                      <motion.a
-                        whileHover={{ scale: 1.05 }}
-                        href={project.demo_url}
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        {t("projects.liveDemo")}
-                      </motion.a>
-                      <motion.a
-                        whileHover={{ scale: 1.05 }}
-                        href={project.github_url}
-                        className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Github className="h-4 w-4 mr-2" />
-                        {t("projects.github")}
-                      </motion.a>
+                    <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-6">
+                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500">
+                        Project Details
+                      </span>
+                      <div className="flex -space-x-2">
+                        {/* Decorative avatars for 'team' feel or tech stack icons could go here */}
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-bold text-blue-600 tracking-tighter">JS</div>
+                        <div className="w-8 h-8 rounded-full bg-purple-500/20 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-bold text-purple-600 tracking-tighter">TS</div>
+                        <div className="w-8 h-8 rounded-full bg-green-500/20 border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-bold text-green-600 tracking-tighter">API</div>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

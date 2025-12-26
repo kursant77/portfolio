@@ -1,4 +1,4 @@
-import { ContactInfo, Project, Service } from '../types/database';
+import { ContactInfo, Project, Service, AboutSection } from '../types/database';
 
 export interface PersonSchema {
     '@context': string;
@@ -109,16 +109,19 @@ export interface FAQPageSchema {
 
 export function generatePersonSchema(
     contactInfo?: ContactInfo | null,
+    aboutData?: AboutSection | null,
     currentLanguage: string = 'uz'
 ): PersonSchema {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
+    const contentKey = `content_${currentLanguage}` as keyof AboutSection;
+    const defaultDesc = 'Professional Full Stack Developer specializing in React, TypeScript, Node.js, and modern web technologies. Experienced in building scalable web applications and e-commerce platforms.';
 
     return {
         '@context': 'https://schema.org',
         '@type': 'Person',
         name: 'Asadbek Jumanazarov',
         jobTitle: 'Full Stack Developer',
-        description: 'Professional Full Stack Developer specializing in React, TypeScript, Node.js, and modern web technologies. Experienced in building scalable web applications and e-commerce platforms.',
+        description: aboutData?.[contentKey] || defaultDesc,
         url: baseUrl,
         email: contactInfo?.email || 'kursant410@gmail.com',
         telephone: contactInfo?.phone || '+998900033723',
@@ -286,12 +289,15 @@ export function generateNavigationSchema(baseUrl: string): SiteNavigationElement
     };
 }
 
-export function generateFAQSchema(currentLanguage: string = 'uz'): FAQPageSchema {
+export function generateFAQSchema(aboutData?: AboutSection | null, currentLanguage: string = 'uz'): FAQPageSchema {
+    const contentKey = `content_${currentLanguage}` as keyof AboutSection;
+    const aboutContent = aboutData?.[contentKey] || "";
+
     const faqs = {
         uz: [
             {
                 q: "Asadbek Jumanazarov kim?",
-                a: "Asadbek Jumanazarov - O'zbekistonning Xorazm viloyati Shovot tumanidan bo'lgan professional Full Stack dasturchi. U React, TypeScript va Node.js texnologiyalari bo'yicha mutaxassis."
+                a: aboutContent || "Asadbek Jumanazarov - O'zbekistonning Xorazm viloyati Shovot tumanidan bo'lgan professional Full Stack dasturchi. U React, TypeScript va Node.js texnologiyalari bo'yicha mutaxassis."
             },
             {
                 q: "Asadbek Jumanazarov qanday xizmatlarni taklif qiladi?",
@@ -305,7 +311,7 @@ export function generateFAQSchema(currentLanguage: string = 'uz'): FAQPageSchema
         en: [
             {
                 q: "Who is Asadbek Jumanazarov?",
-                a: "Asadbek Jumanazarov is a professional Full Stack Developer from Shovot, Khorezm region, Uzbekistan. He specializes in React, TypeScript, and Node.js."
+                a: aboutContent || "Asadbek Jumanazarov is a professional Full Stack Developer from Shovot, Khorezm region, Uzbekistan. He specializes in React, TypeScript, and Node.js."
             },
             {
                 q: "What services does Asadbek Jumanazarov offer?",
@@ -315,7 +321,7 @@ export function generateFAQSchema(currentLanguage: string = 'uz'): FAQPageSchema
         ru: [
             {
                 q: "Кто такой Асадбек Джуманазаров?",
-                a: "Асадбек Джуманазаров — профессиональный Full Stack разработчик из Шаватского района Хорезмской области, Узбекистан. Специализируется на React, TypeScript и Node.js."
+                a: aboutContent || "Асадбек Джуманазаров — профессиональный Full Stack разработчик из Шаватского района Хорезмской области, Узбекистан. Специализируется на React, TypeScript и Node.js."
             }
         ]
     };
@@ -341,17 +347,18 @@ export function generateAllStructuredData(
     contactInfo?: ContactInfo | null,
     projects?: Project[],
     services?: Service[],
+    aboutData?: AboutSection | null,
     currentLanguage: string = 'uz'
 ): Array<PersonSchema | ContactPointSchema | ItemListSchema | BreadcrumbListSchema | SiteNavigationElementSchema | WebSiteSchema | FAQPageSchema> {
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
 
     const schemas: Array<any> = [
-        generatePersonSchema(contactInfo, currentLanguage),
+        generatePersonSchema(contactInfo, aboutData, currentLanguage),
         generateContactPointSchema(contactInfo),
         generateBreadcrumbSchema(baseUrl),
         generateNavigationSchema(baseUrl),
         generateWebSiteSchema(baseUrl),
-        generateFAQSchema(currentLanguage)
+        generateFAQSchema(aboutData, currentLanguage)
     ];
 
     if (projects && projects.length > 0) {

@@ -2,17 +2,22 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronDown, HelpCircle } from 'lucide-react';
+import { useAboutSection } from '../hooks/useSupabaseData';
 
 export default function FAQ() {
     const { t, i18n } = useTranslation();
     const currentLanguage = i18n.language || 'uz';
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
+    const { aboutData } = useAboutSection();
+    const contentKey = `content_${currentLanguage}` as keyof typeof aboutData;
+    const aboutContent = aboutData?.[contentKey] || "";
+
     const faqs = {
         uz: [
             {
                 q: "Asadbek Jumanazarov kim?",
-                a: "Asadbek Jumanazarov - O'zbekistonning Xorazm viloyati Shovot tumanidan bo'lgan professional Full Stack dasturchi. U React, TypeScript va Node.js texnologiyalari bo'yicha mutaxassis."
+                a: aboutContent || "Asadbek Jumanazarov - O'zbekistonning Xorazm viloyati Shovot tumanidan bo'lgan professional Full Stack dasturchi. U React, TypeScript va Node.js texnologiyalari bo'yicha mutaxassis."
             },
             {
                 q: "Qanday loyihalar bilan ishlaysiz?",
@@ -30,7 +35,7 @@ export default function FAQ() {
         en: [
             {
                 q: "Who is Asadbek Jumanazarov?",
-                a: "Asadbek Jumanazarov is a professional Full Stack Developer from Shovot, Khorezm region, Uzbekistan. He specializes in React, TypeScript, and Node.js."
+                a: aboutContent || "Asadbek Jumanazarov is a professional Full Stack Developer from Shovot, Khorezm region, Uzbekistan. He specializes in React, TypeScript, and Node.js."
             },
             {
                 q: "What kind of projects do you handle?",
@@ -44,7 +49,7 @@ export default function FAQ() {
         ru: [
             {
                 q: "Кто такой Асадбек Джуманазаров?",
-                a: "Асадбек Джуманазаров — профессиональный Full Stack разработчик из Шаватского района Хорезмской области, Узбекистан. Специализируется на React, TypeScript и Node.js."
+                a: aboutContent || "Асадбек Джуманазаров — профессиональный Full Stack разработчик из Шаватского района Хорезмской области, Узбекистан. Специализируется на React, TypeScript и Node.js."
             }
         ]
     };
@@ -72,26 +77,26 @@ export default function FAQ() {
                     </p>
                 </motion.div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                     {currentFaqs.map((faq, idx) => (
                         <motion.div
                             key={idx}
-                            initial={{ opacity: 0, y: 10 }}
-                            whileInView={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
                             viewport={{ once: true }}
-                            className="border border-gray-100 dark:border-gray-800 rounded-2xl overflow-hidden"
+                            className="bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-gray-700/30 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500"
                         >
                             <button
                                 onClick={() => setActiveIndex(activeIndex === idx ? null : idx)}
-                                className="w-full flex items-center justify-between p-6 text-left bg-gray-50/50 dark:bg-gray-800/20 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
+                                className="w-full flex items-center justify-between p-8 text-left hover:bg-white/20 dark:hover:bg-gray-700/20 transition-all group"
                             >
-                                <span className="font-semibold text-gray-900 dark:text-white pr-8">
+                                <span className={`text-lg font-black tracking-tight transition-colors duration-300 ${activeIndex === idx ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>
                                     {faq.q}
                                 </span>
-                                <ChevronDown
-                                    className={`w-5 h-5 text-gray-500 transition-transform duration-300 ${activeIndex === idx ? 'rotate-180' : ''}`}
-                                />
+                                <div className={`p-2 rounded-xl transition-all duration-500 ${activeIndex === idx ? 'bg-blue-600 text-white rotate-180' : 'bg-gray-100 dark:bg-gray-700 text-gray-500'}`}>
+                                    <ChevronDown className="w-5 h-5" />
+                                </div>
                             </button>
 
                             <AnimatePresence>
@@ -100,9 +105,9 @@ export default function FAQ() {
                                         initial={{ height: 0, opacity: 0 }}
                                         animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }}
-                                        transition={{ duration: 0.3 }}
+                                        transition={{ duration: 0.5, ease: [0.04, 0.62, 0.23, 0.98] }}
                                     >
-                                        <div className="p-6 pt-2 text-gray-600 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800">
+                                        <div className="p-8 pt-2 text-lg text-gray-600 dark:text-gray-400 font-medium leading-relaxed border-t border-white/10 dark:border-gray-700/20">
                                             {faq.a}
                                         </div>
                                     </motion.div>

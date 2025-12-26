@@ -59,6 +59,20 @@ export interface CVInfo {
   updated_at?: string;
 }
 
+export interface AboutSection {
+  id: string;
+  title_uz: string;
+  title_en: string;
+  title_ru: string;
+  content_uz: string;
+  content_en: string;
+  content_ru: string;
+  experience_years?: string;
+  projects_completed?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface ContactMessage {
   id: string;
   name: string;

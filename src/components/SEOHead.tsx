@@ -1,7 +1,7 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
-import { useContactInfo, useProjects, useServices } from '../hooks/useSupabaseData';
+import { useContactInfo, useProjects, useServices, useAboutSection } from '../hooks/useSupabaseData';
 import { generateAllStructuredData } from '../utils/structuredData';
 
 export default function SEOHead() {
@@ -9,6 +9,7 @@ export default function SEOHead() {
     const { contactInfo } = useContactInfo();
     const { projects } = useProjects();
     const { services } = useServices();
+    const { aboutData } = useAboutSection();
 
     const currentLanguage = i18n.language || 'uz';
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
@@ -18,6 +19,7 @@ export default function SEOHead() {
         contactInfo,
         projects,
         services,
+        aboutData,
         currentLanguage
     );
 

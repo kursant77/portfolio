@@ -6,13 +6,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../lib/supabase';
 import AdminSidebar from '../components/AdminSidebar';
-import { 
-  LogOut, 
-  Settings, 
-  Code, 
-  FolderKanban, 
-  Briefcase, 
-  FileText, 
+import {
+  LogOut,
+  Settings,
+  Code,
+  FolderKanban,
+  Briefcase,
+  FileText,
   MessageSquare,
   Plus,
   Edit,
@@ -27,9 +27,10 @@ import {
   Upload,
   LayoutDashboard,
   Download,
-  Eye
+  Eye,
+  User
 } from 'lucide-react';
-import { Skill, Project, Service, ContactInfo, CVInfo } from '../types/database';
+import { Skill, Project, Service, ContactInfo, CVInfo, AboutSection } from '../types/database';
 import AdminModal from '../components/AdminModal';
 import { uploadImage, getImagePreview } from '../utils/imageUpload';
 import { getColorByIcon } from '../utils/colorGenerator';
@@ -39,16 +40,17 @@ function AdminDashboardContent() {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
+
   // Data states
   const [skills, setSkills] = useState<Skill[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [cvInfo, setCvInfo] = useState<CVInfo | null>(null);
-  
+  const [aboutData, setAboutData] = useState<AboutSection | null>(null);
+
   // Loading states
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<string | null>(null);
@@ -60,7 +62,7 @@ function AdminDashboardContent() {
       return;
     }
     fetchAllData();
-    
+
     // Desktop da sidebar har doim ochiq
     const checkSidebar = () => {
       if (window.innerWidth >= 1024) {
@@ -83,6 +85,7 @@ function AdminDashboardContent() {
         fetchServices(),
         fetchContactInfo(),
         fetchCVInfo(),
+        fetchAboutData(),
       ]);
     } finally {
       setLoading(false);
@@ -174,6 +177,23 @@ function AdminDashboardContent() {
     }
   };
 
+  const fetchAboutData = async () => {
+    try {
+      const { data, error } = await supabase.from('about_section').select('*').limit(1).single();
+      if (error && error.code !== 'PGRST116') {
+        if (import.meta.env.DEV) {
+          console.error('Error fetching about data:', error);
+        }
+      } else if (data) {
+        setAboutData(data);
+      }
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching about data:', error);
+      }
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/admin/login');
@@ -182,15 +202,15 @@ function AdminDashboardContent() {
   const handleDelete = async (table: string, id: string) => {
     const confirmed = window.confirm('O\'chirishni tasdiqlaysizmi?');
     if (!confirmed) return;
-    
-    const deletePromise = supabase.from(table).delete().eq('id', id);
-    
+
+    const deletePromise = (async () => {
+      const { error } = await supabase.from(table).delete().eq('id', id);
+      if (error) throw error;
+    })();
+
     toast.promise(deletePromise, {
       loading: 'O\'chirilmoqda...',
-      success: (result) => {
-        if (result.error) {
-          throw new Error(result.error.message);
-        }
+      success: () => {
         cache.clear(table);
         fetchAllData();
         return 'Muvaffaqiyatli o\'chirildi!';
@@ -225,6 +245,7 @@ function AdminDashboardContent() {
           services: services.length,
           contact: contactInfo ? 1 : 0,
           cv: cvInfo ? 1 : 0,
+          about: aboutData ? 1 : 0,
         }}
       />
 
@@ -249,7 +270,7 @@ function AdminDashboardContent() {
                   <p className="text-sm text-gray-400">Monitoring va boshqaruv</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-3">
                 {/* User Info */}
                 <div className="flex items-center space-x-3 pl-3 border-l border-gray-700">
@@ -275,6 +296,7 @@ function AdminDashboardContent() {
               services={services}
               contactInfo={contactInfo}
               cvInfo={cvInfo}
+              aboutData={aboutData}
               onNavigate={(tab) => setActiveTab(tab)}
             />
           ) : (
@@ -314,6 +336,12 @@ function AdminDashboardContent() {
                   projectsCount={projects.length}
                 />
               )}
+              {activeTab === 'about' && (
+                <AboutTab
+                  aboutData={aboutData}
+                  onRefresh={fetchAboutData}
+                />
+              )}
             </>
           )}
         </main>
@@ -329,6 +357,7 @@ function DashboardView({
   services,
   contactInfo,
   cvInfo,
+  aboutData,
   onNavigate,
 }: {
   skills: Skill[];
@@ -336,7 +365,8 @@ function DashboardView({
   services: Service[];
   contactInfo: ContactInfo | null;
   cvInfo: CVInfo | null;
-  onNavigate: (tab: 'skills' | 'projects' | 'services' | 'contact' | 'cv') => void;
+  aboutData: AboutSection | null;
+  onNavigate: (tab: 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about') => void;
 }) {
   return (
     <div>
@@ -350,7 +380,7 @@ function DashboardView({
       </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -364,7 +394,7 @@ function DashboardView({
             <p className="text-xs text-gray-500">Total skills count</p>
           </div>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -378,7 +408,7 @@ function DashboardView({
             <p className="text-xs text-gray-500">Total projects</p>
           </div>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -392,7 +422,7 @@ function DashboardView({
             <p className="text-xs text-gray-500">Total services</p>
           </div>
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -420,6 +450,20 @@ function DashboardView({
             <p className="text-xs text-gray-500">CV information</p>
           </div>
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-gray-800 rounded-lg shadow-lg p-5 border border-gray-700 hover:border-yellow-500 transition-colors cursor-pointer"
+          onClick={() => onNavigate('about')}
+        >
+          <div>
+            <p className="text-xs text-gray-400 mb-1">About</p>
+            <p className="text-2xl font-bold text-white mb-2">{aboutData ? '1' : '0'}</p>
+            <p className="text-xs text-gray-500">About information</p>
+          </div>
+        </motion.div>
       </div>
 
       {/* Additional Stats or Quick Actions */}
@@ -432,6 +476,15 @@ function DashboardView({
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h3 className="text-lg font-semibold text-white mb-4">Tezkor Amallar</h3>
           <div className="space-y-3">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onNavigate('about')}
+              className="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-between"
+            >
+              <span className="text-white">About boshqaruvi</span>
+              <span className="text-gray-400">{aboutData ? '1' : '0'} ta</span>
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -467,18 +520,23 @@ function DashboardView({
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
               <span className="text-gray-300">Contact Info</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                contactInfo ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${contactInfo ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                }`}>
                 {contactInfo ? 'Mavjud' : 'Yo\'q'}
               </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
               <span className="text-gray-300">CV Fayl</span>
-              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                cvInfo?.cv_file_url ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-              }`}>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${cvInfo?.cv_file_url ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                }`}>
                 {cvInfo?.cv_file_url ? 'Yuklangan' : 'Yuklanmagan'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+              <span className="text-gray-300">About Matni</span>
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold ${aboutData ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                }`}>
+                {aboutData ? 'Mavjud' : 'Yo\'q'}
               </span>
             </div>
           </div>
@@ -505,20 +563,21 @@ function SkillsTab({ skills, onRefresh, onDelete }: { skills: Skill[]; onRefresh
       toast.error('Iltimos, Name va Icon maydonlarini to\'ldiring!');
       return;
     }
-    
+
     try {
       // Avtomatik rang tanlash
       const autoColor = getColorByIcon(formData.icon);
       const dataToSave = { ...formData, color: autoColor };
-      
+
       if (editingId) {
-        const updatePromise = supabase.from('skills').update(dataToSave).eq('id', editingId);
+        const updatePromise = (async () => {
+          const { error } = await supabase.from('skills').update(dataToSave).eq('id', editingId);
+          if (error) throw error;
+        })();
+
         toast.promise(updatePromise, {
           loading: 'Yangilanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('skills');
             setShowAddModal(false);
             setEditingId(null);
@@ -529,13 +588,14 @@ function SkillsTab({ skills, onRefresh, onDelete }: { skills: Skill[]; onRefresh
           error: (error) => `Skill yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
         });
       } else {
-        const insertPromise = supabase.from('skills').insert([dataToSave]);
+        const insertPromise = (async () => {
+          const { error } = await supabase.from('skills').insert([dataToSave]);
+          if (error) throw error;
+        })();
+
         toast.promise(insertPromise, {
           loading: 'Qo\'shilmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('skills');
             setShowAddModal(false);
             setFormData({ name: '', level: 0, icon: '', color: '' });
@@ -732,13 +792,14 @@ function ProjectsTab({ projects, onRefresh, onDelete }: { projects: Project[]; o
 
     try {
       if (editingId) {
-        const updatePromise = supabase.from('projects').update(formData).eq('id', editingId);
+        const updatePromise = (async () => {
+          const { error } = await supabase.from('projects').update(formData).eq('id', editingId);
+          if (error) throw error;
+        })();
+
         toast.promise(updatePromise, {
           loading: 'Yangilanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('projects');
             setShowAddModal(false);
             setEditingId(null);
@@ -750,13 +811,14 @@ function ProjectsTab({ projects, onRefresh, onDelete }: { projects: Project[]; o
           error: (error) => `Project yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
         });
       } else {
-        const insertPromise = supabase.from('projects').insert([formData]);
+        const insertPromise = (async () => {
+          const { error } = await supabase.from('projects').insert([formData]);
+          if (error) throw error;
+        })();
+
         toast.promise(insertPromise, {
           loading: 'Qo\'shilmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('projects');
             setShowAddModal(false);
             setImagePreview(null);
@@ -1061,15 +1123,15 @@ function ServicesTab({ services, onRefresh, onDelete }: { services: Service[]; o
       // Avtomatik rang tanlash
       const autoColor = getColorByIcon(formData.icon || 'Code');
       const dataToSave = { ...formData, color: autoColor };
-      
+
       if (editingId) {
-        const updatePromise = supabase.from('services').update(dataToSave).eq('id', editingId);
+        const updatePromise = (async () => {
+          const { error } = await supabase.from('services').update(dataToSave).eq('id', editingId);
+          if (error) throw error;
+        })();
         toast.promise(updatePromise, {
           loading: 'Yangilanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('services');
             setShowAddModal(false);
             setEditingId(null);
@@ -1080,13 +1142,13 @@ function ServicesTab({ services, onRefresh, onDelete }: { services: Service[]; o
           error: (error) => `Service yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
         });
       } else {
-        const insertPromise = supabase.from('services').insert([dataToSave]);
+        const insertPromise = (async () => {
+          const { error } = await supabase.from('services').insert([dataToSave]);
+          if (error) throw error;
+        })();
         toast.promise(insertPromise, {
           loading: 'Qo\'shilmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('services');
             setShowAddModal(false);
             setFormData({ key: '', icon: '', color: '', title_en: '', title_uz: '', title_ru: '' });
@@ -1277,13 +1339,14 @@ function ContactTab({ contactInfo, onRefresh }: { contactInfo: ContactInfo | nul
   const handleSave = async () => {
     try {
       if (contactInfo) {
-        const updatePromise = supabase.from('contact_info').update(formData).eq('id', contactInfo.id);
+        const updatePromise = (async () => {
+          const { error } = await supabase.from('contact_info').update(formData).eq('id', contactInfo.id);
+          if (error) throw error;
+        })();
+
         toast.promise(updatePromise, {
           loading: 'Yangilanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('contact_info');
             setEditing(false);
             onRefresh();
@@ -1292,13 +1355,14 @@ function ContactTab({ contactInfo, onRefresh }: { contactInfo: ContactInfo | nul
           error: (error) => `Contact ma'lumotlarini yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
         });
       } else {
-        const insertPromise = supabase.from('contact_info').insert([formData]);
+        const insertPromise = (async () => {
+          const { error } = await supabase.from('contact_info').insert([formData]);
+          if (error) throw error;
+        })();
+
         toast.promise(insertPromise, {
           loading: 'Qo\'shilmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('contact_info');
             setEditing(false);
             onRefresh();
@@ -1394,13 +1458,13 @@ function ContactTab({ contactInfo, onRefresh }: { contactInfo: ContactInfo | nul
 }
 
 // CV Tab Component
-function CVTab({ 
-  cvInfo, 
-  onRefresh, 
-  skillsCount, 
-  projectsCount 
-}: { 
-  cvInfo: CVInfo | null; 
+function CVTab({
+  cvInfo,
+  onRefresh,
+  skillsCount,
+  projectsCount
+}: {
+  cvInfo: CVInfo | null;
   onRefresh: () => void;
   skillsCount: number;
   projectsCount: number;
@@ -1462,7 +1526,7 @@ function CVTab({
           console.error('Upload error:', uploadError);
         }
         let errorMessage = 'Fayl yuklashda xatolik yuz berdi!';
-        
+
         if (uploadError.message.includes('Bucket not found')) {
           errorMessage = 'Storage bucket topilmadi! Iltimos, Supabase da "portfolio-images" bucket yaratilganligini tekshiring.';
         } else if (uploadError.message.includes('new row violates row-level security')) {
@@ -1470,7 +1534,7 @@ function CVTab({
         } else if (uploadError.message) {
           errorMessage = `Fayl yuklashda xatolik: ${uploadError.message}`;
         }
-        
+
         toast.error(errorMessage);
         setUploading(false);
         return;
@@ -1499,17 +1563,17 @@ function CVTab({
       };
 
       if (cvInfo) {
-        const updatePromise = supabase
-          .from('cv_info')
-          .update(dataToSave)
-          .eq('id', cvInfo.id);
-        
+        const updatePromise = (async () => {
+          const { error } = await supabase
+            .from('cv_info')
+            .update(dataToSave)
+            .eq('id', cvInfo.id);
+          if (error) throw error;
+        })();
+
         toast.promise(updatePromise, {
           loading: 'Saqlanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('cv_info');
             setCvFileUrl(publicUrl);
             onRefresh();
@@ -1518,16 +1582,16 @@ function CVTab({
           error: (error) => `Ma'lumotlar bazasiga saqlashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
         });
       } else {
-        const insertPromise = supabase
-          .from('cv_info')
-          .insert([dataToSave]);
-        
+        const insertPromise = (async () => {
+          const { error } = await supabase
+            .from('cv_info')
+            .insert([dataToSave]);
+          if (error) throw error;
+        })();
+
         toast.promise(insertPromise, {
           loading: 'Saqlanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('cv_info');
             setCvFileUrl(publicUrl);
             onRefresh();
@@ -1548,7 +1612,7 @@ function CVTab({
     try {
       // CV fayl URL ni tekshirish - agar bo'sh bo'lsa, mavjud URL dan foydalanish
       const fileUrl = cvFileUrl || cvInfo?.cv_file_url || '';
-      
+
       if (!fileUrl && !cvInfo) {
         toast.error('Iltimos, avval CV faylni yuklang!');
         return;
@@ -1563,17 +1627,17 @@ function CVTab({
       };
 
       if (cvInfo) {
-        const updatePromise = supabase
-          .from('cv_info')
-          .update(dataToSave)
-          .eq('id', cvInfo.id);
-        
+        const updatePromise = (async () => {
+          const { error } = await supabase
+            .from('cv_info')
+            .update(dataToSave)
+            .eq('id', cvInfo.id);
+          if (error) throw error;
+        })();
+
         toast.promise(updatePromise, {
           loading: 'Yangilanmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('cv_info');
             setEditing(false);
             onRefresh();
@@ -1582,16 +1646,16 @@ function CVTab({
           error: (error) => `CV ma'lumotlarini yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
         });
       } else {
-        const insertPromise = supabase
-          .from('cv_info')
-          .insert([dataToSave]);
-        
+        const insertPromise = (async () => {
+          const { error } = await supabase
+            .from('cv_info')
+            .insert([dataToSave]);
+          if (error) throw error;
+        })();
+
         toast.promise(insertPromise, {
           loading: 'Qo\'shilmoqda...',
-          success: (result) => {
-            if (result.error) {
-              throw new Error(result.error.message);
-            }
+          success: () => {
             cache.clear('cv_info');
             setEditing(false);
             onRefresh();
@@ -1625,7 +1689,7 @@ function CVTab({
         {/* CV Information Section */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h3 className="text-lg font-semibold text-white mb-4">CV Ma'lumotlari</h3>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">Ism</label>
@@ -1692,7 +1756,7 @@ function CVTab({
         {/* File Upload Section */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h3 className="text-lg font-semibold text-white mb-4">CV Fayl Yuklash</h3>
-          
+
           <div className="space-y-4">
             <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-600 rounded-lg cursor-pointer hover:border-blue-500 transition-colors bg-gray-700">
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -1765,6 +1829,185 @@ function CVTab({
             <p>Hozircha CV fayl yuklanmagan</p>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// About Tab Component
+function AboutTab({ aboutData, onRefresh }: { aboutData: AboutSection | null; onRefresh: () => void }) {
+  const [editing, setEditing] = useState(false);
+  const [formData, setFormData] = useState<Partial<AboutSection>>(aboutData || {});
+
+  useEffect(() => {
+    if (aboutData) setFormData(aboutData);
+  }, [aboutData]);
+
+  const handleSave = async () => {
+    try {
+      if (aboutData) {
+        const updatePromise = (async () => {
+          const { error } = await supabase.from('about_section').update(formData).eq('id', aboutData.id);
+          if (error) throw error;
+        })();
+
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: () => {
+            cache.clear('about_section');
+            setEditing(false);
+            onRefresh();
+            return 'About ma\'lumotlari muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `Yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
+      } else {
+        const insertPromise = (async () => {
+          const { error } = await supabase.from('about_section').insert([formData]);
+          if (error) throw error;
+        })();
+
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: () => {
+            cache.clear('about_section');
+            setEditing(false);
+            onRefresh();
+            return 'About ma\'lumotlari muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `Qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
+      }
+    } catch (error: any) {
+      toast.error('Xatolik yuz berdi: ' + error.message);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-bold text-white">About Boshqaruvi</h2>
+          <p className="text-sm text-gray-400 mt-1 italic">Bu bo'lim AI qidiruvlari uchun asosiy manba hisoblanadi</p>
+        </div>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setEditing(!editing)}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg"
+        >
+          {editing ? <X className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
+          {editing ? 'Bekor qilish' : 'Tahrirlash'}
+        </motion.button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6">
+        <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-xl">
+          <div className="flex items-center gap-2 mb-6 text-yellow-500">
+            <Bell className="h-5 w-5" />
+            <p className="text-sm font-medium italic">
+              AI (ChatGPT, Gemini) "Asadbek Jumanazarov kim?" deb so'ralganda bu yerdagi ma'lumotlarni o'qiydi. Aniq va lo'nda yozing.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {/* Title & Content - UZ */}
+            <div className="space-y-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+              <h3 className="text-blue-400 font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                UZBEKCHA (Asosiy)
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Sarlavha (Title)</label>
+                <input
+                  type="text"
+                  value={formData.title_uz || ''}
+                  onChange={(e) => setFormData({ ...formData, title_uz: e.target.value })}
+                  disabled={!editing}
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Asosiy matn (Description)</label>
+                <textarea
+                  value={formData.content_uz || ''}
+                  onChange={(e) => setFormData({ ...formData, content_uz: e.target.value })}
+                  disabled={!editing}
+                  rows={6}
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Title & Content - EN */}
+            <div className="space-y-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+              <h3 className="text-purple-400 font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+                ENGLISH (For Global Search)
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Title</label>
+                <input
+                  type="text"
+                  value={formData.title_en || ''}
+                  onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                  disabled={!editing}
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Description</label>
+                <textarea
+                  value={formData.content_en || ''}
+                  onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
+                  disabled={!editing}
+                  rows={6}
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white resize-none"
+                />
+              </div>
+            </div>
+
+            {/* Title & Content - RU */}
+            <div className="space-y-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+              <h3 className="text-red-400 font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-400"></span>
+                RUSSIAN
+              </h3>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Заголовок</label>
+                <input
+                  type="text"
+                  value={formData.title_ru || ''}
+                  onChange={(e) => setFormData({ ...formData, title_ru: e.target.value })}
+                  disabled={!editing}
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">Описание</label>
+                <textarea
+                  value={formData.content_ru || ''}
+                  onChange={(e) => setFormData({ ...formData, content_ru: e.target.value })}
+                  disabled={!editing}
+                  rows={6}
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg bg-gray-900 text-white resize-none"
+                />
+              </div>
+            </div>
+
+            {editing && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleSave}
+                className="w-full flex items-center justify-center py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl shadow-xl font-bold"
+              >
+                <Save className="h-5 w-5 mr-2" />
+                BARCHA O'ZGARISHLARNI SAQLASH
+              </motion.button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -36,61 +36,62 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="fixed top-0 w-[100%] left-0 right-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/20 dark:border-gray-700/20"
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 1, ease: "easeOut" }}
+      className="fixed top-6 left-0 right-0 z-50 px-4 md:px-0"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto bg-white/40 dark:bg-gray-900/40 backdrop-blur-2xl border border-white/20 dark:border-gray-700/30 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.1)] px-6 md:px-10">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-3 cursor-pointer group"
           >
-            <Code className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
-              Asadbek
+            <div className="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl shadow-lg transform group-hover:rotate-12 transition-transform duration-300">
+              <Code className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-xl font-black text-gray-900 dark:text-white tracking-tighter">
+              ASADBEK<span className="text-blue-500">.</span>
             </span>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden lg:flex items-center space-x-10">
             {navItems.map((item) => (
               <motion.button
                 key={item.key}
                 whileHover={{ y: -2 }}
                 onClick={() => scrollToSection(item.href)}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+                className="text-sm font-bold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 uppercase tracking-widest relative group"
               >
                 {t(`nav.${item.key}`)}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300" />
               </motion.button>
             ))}
           </div>
 
           {/* Controls */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-5">
             {/* Language Selector */}
-            <div className="relative">
-              <select
-                value={i18n.language}
-                onChange={(e) => i18n.changeLanguage(e.target.value)}
-                className="bg-transparent text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {languages.map((lang) => (
-                  <option key={lang.code} value={lang.code} className="bg-white dark:bg-gray-800">
-                    {lang.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={i18n.language}
+              onChange={(e) => i18n.changeLanguage(e.target.value)}
+              className="hidden sm:block bg-transparent text-gray-700 dark:text-gray-300 border-none font-bold text-xs focus:ring-0 cursor-pointer hover:text-blue-500 transition-colors"
+            >
+              {languages.map((lang) => (
+                <option key={lang.code} value={lang.code} className="bg-white dark:bg-gray-900">
+                  {lang.name}
+                </option>
+              ))}
+            </select>
 
             {/* Theme Toggle */}
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
-              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+              className="p-2.5 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-lg transition-all"
             >
               {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </motion.button>
@@ -99,7 +100,7 @@ export default function Navbar() {
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-700 dark:text-gray-300"
+              className="lg:hidden p-2 text-gray-700 dark:text-gray-300"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </motion.button>
@@ -109,17 +110,16 @@ export default function Navbar() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-gray-200/20 dark:border-gray-700/20 py-4"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="lg:hidden pb-6 space-y-4 border-t border-gray-100 dark:border-gray-800 pt-6"
           >
             {navItems.map((item) => (
               <motion.button
                 key={item.key}
-                whileHover={{ x: 10 }}
+                whileTap={{ x: 10 }}
                 onClick={() => scrollToSection(item.href)}
-                className="block w-full text-left py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                className="block w-full text-center text-lg font-bold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
               >
                 {t(`nav.${item.key}`)}
               </motion.button>

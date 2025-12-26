@@ -72,7 +72,7 @@ export default function Footer() {
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
-      className="bg-gray-900 text-white py-12 mt-10 pt-8 border-t border-gray-700"
+      className="bg-gray-900 text-white py-12 pt-8 border-t border-gray-700"
     >
       <div className="flex flex-col gap-5 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Yuqori qism: slogan + nav + social */}

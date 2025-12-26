@@ -48,7 +48,7 @@ function Skills() {
   };
 
   return (
-    <section id="skills" className="relative py-20 bg-white dark:bg-gray-900">
+    <section id="skills" className="relative py-24 bg-transparent dark:bg-gray-800">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
@@ -85,32 +85,45 @@ function Skills() {
                 variants={itemVariants}
                 whileHover={{
                   scale: 1.05,
-                  y: -5,
-                  transition: { duration: 0.2 }
+                  y: -10,
+                  rotate: [0, 1, -1, 0],
+                  transition: { duration: 0.3 }
                 }}
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group cursor-pointer"
+                className="relative bg-white/40 dark:bg-gray-800/40 backdrop-blur-xl rounded-3xl p-8 border border-white/20 dark:border-gray-700/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 group overflow-hidden"
               >
-                <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${skill.color} text-white mb-4`}>
+                {/* Background Accent */}
+                <div className={`absolute -top-12 -right-12 w-24 h-24 bg-gradient-to-br ${skill.color} opacity-10 group-hover:opacity-20 rounded-full transition-opacity duration-500`} />
+
+                <div className={`relative inline-flex p-4 rounded-2xl bg-gradient-to-br ${skill.color} text-white mb-6 shadow-lg shadow-blue-500/20 transform group-hover:rotate-6 transition-transform duration-500`}>
                   {getIcon(skill.icon || 'Code')}
                 </div>
 
-                <h3 itemProp="knowsAbout" className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                <h3 itemProp="knowsAbout" className="text-xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">
                   {skill.name}
                 </h3>
 
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: `${skill.level}%` }}
-                    transition={{ duration: 1, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                    className={`h-2 rounded-full bg-gradient-to-r ${skill.color}`}
-                  />
-                </div>
+                <div className="space-y-3">
+                  <div className="w-full bg-gray-200/50 dark:bg-gray-700/30 rounded-full h-2.5 overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.level}%` }}
+                      transition={{ duration: 1.5, ease: "easeOut" }}
+                      viewport={{ once: true }}
+                      className={`h-full rounded-full bg-gradient-to-r ${skill.color} relative`}
+                    >
+                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                    </motion.div>
+                  </div>
 
-                <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                  {skill.level}%
-                </span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                      Mastery
+                    </span>
+                    <span className="text-lg font-black text-gray-900 dark:text-white">
+                      {skill.level}%
+                    </span>
+                  </div>
+                </div>
               </motion.div>
             ))
           )}

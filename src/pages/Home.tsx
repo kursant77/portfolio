@@ -3,6 +3,7 @@ import { ThemeProvider } from '../contexts/ThemeContext';
 import SEOHead from '../components/SEOHead';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
+import Background3D from '../components/Background3D';
 
 // Lazy load components for performance
 const About = React.lazy(() => import('../components/About'));
@@ -24,7 +25,8 @@ export default function Home() {
   return (
     <ThemeProvider>
       <SEOHead />
-      <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
+      <div className="min-h-screen bg-white dark:bg-transparent transition-colors duration-700 relative">
+        <Background3D />
         <Navbar />
         <Hero />
         <Suspense fallback={<LoadingFallback />}>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Code, 
-  FolderKanban, 
-  Briefcase, 
-  FileText, 
+import {
+  Code,
+  FolderKanban,
+  Briefcase,
+  FileText,
   MessageSquare,
   Menu,
   X,
@@ -13,14 +13,15 @@ import {
   LayoutDashboard,
   Sun,
   Moon,
-  ChevronRight
+  ChevronRight,
+  User
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface AdminSidebarProps {
-  activeTab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv';
-  setActiveTab: (tab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv') => void;
+  activeTab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about';
+  setActiveTab: (tab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about') => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSignOut: () => void;
@@ -30,6 +31,7 @@ interface AdminSidebarProps {
     services: number;
     contact: number;
     cv: number;
+    about: number;
   };
 }
 
@@ -42,6 +44,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
   ];
 
   const contentSection = [
+    { key: 'about', label: 'About', icon: User, count: counts.about },
     { key: 'skills', label: 'Skills', icon: Code, count: counts.skills },
     { key: 'projects', label: 'Projects', icon: FolderKanban, count: counts.projects },
     { key: 'services', label: 'Services', icon: Briefcase, count: counts.services },
@@ -106,7 +109,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                 {mainSection.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === 'dashboard';
-                  
+
                   return (
                     <motion.button
                       key={item.key}
@@ -116,11 +119,10 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                         setActiveTab('dashboard');
                         setIsOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${
-                        isActive
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
                           : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center space-x-3">
                         <Icon className="h-5 w-5" />
@@ -141,7 +143,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                 {contentSection.map((item, index) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.key;
-                  
+
                   return (
                     <motion.button
                       key={item.key}
@@ -154,22 +156,20 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                         setActiveTab(item.key as any);
                         setIsOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${
-                        isActive
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive
                           ? 'bg-gray-700 text-white'
                           : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center space-x-3">
                         <Icon className="h-5 w-5" />
                         <span className="font-medium text-sm">{item.label}</span>
                       </div>
                       {item.count !== undefined && (
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                          isActive 
-                            ? 'bg-blue-600 text-white' 
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${isActive
+                            ? 'bg-blue-600 text-white'
                             : 'bg-blue-600/20 text-blue-400'
-                        }`}>
+                          }`}>
                           {item.count}
                         </span>
                       )}

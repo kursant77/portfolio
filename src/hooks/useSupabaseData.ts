@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { Skill, Project, Service, ContactInfo, CVInfo } from '../types/database';
+import { Skill, Project, Service, ContactInfo, CVInfo, AboutSection } from '../types/database';
 import { cache } from '../utils/cache';
 
 export function useSkills() {
@@ -330,4 +330,71 @@ export function useCVInfo() {
   }, [fetchCVInfo]);
 
   return { cvInfo, loading, error, refetch: fetchCVInfo };
+}
+
+export function useAboutSection() {
+  const [aboutData, setAboutData] = useState<AboutSection | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchAboutData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check cache first
+      const cached = cache.get<AboutSection>('about_section');
+      if (cached) {
+        setAboutData(cached);
+        setLoading(false);
+        // Fetch in background to update cache
+        Promise.resolve(
+          supabase
+            .from('about_section')
+            .select('*')
+            .limit(1)
+            .single()
+        )
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setAboutData(data);
+              cache.set('about_section', data);
+            }
+          })
+          .catch((err: unknown) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching about section in background:', err);
+            }
+          });
+        return; // Return immediately with cached data
+      }
+
+      // If no cache, or initial fetch
+      const { data, error: apiError } = await supabase
+        .from('about_section')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (apiError) throw apiError;
+
+      if (data) {
+        setAboutData(data);
+        cache.set('about_section', data);
+      }
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.error('Error fetching about section:', err);
+      }
+      setError(err instanceof Error ? err : new Error('Failed to fetch about section'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAboutData();
+  }, [fetchAboutData]);
+
+  return { aboutData, loading, error, refetch: fetchAboutData };
 }
