@@ -11,7 +11,7 @@ export default function SEOHead() {
     const { services } = useServices();
 
     const currentLanguage = i18n.language || 'uz';
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://your-project.vercel.app';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
 
     // Generate structured data
     const structuredData = generateAllStructuredData(

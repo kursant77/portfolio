@@ -6,9 +6,11 @@ const resources = {
     translation: {
       nav: {
         home: "Home",
+        about: "About",
         skills: "Skills",
         projects: "Projects",
         services: "Services",
+        faq: "FAQ",
         cv: "CV",
         contact: "Contact",
       },
@@ -106,9 +108,11 @@ const resources = {
     translation: {
       nav: {
         home: "Bosh sahifa",
+        about: "Men haqimda",
         skills: "Ko'nikmalar",
         projects: "Loyihalar",
         services: "Xizmatlar",
+        faq: "FAQ",
         cv: "CV",
         contact: "Aloqa",
       },
@@ -207,9 +211,11 @@ const resources = {
     translation: {
       nav: {
         home: "Главная",
+        about: "Обо мне",
         skills: "Навыки",
         projects: "Проекты",
         services: "Услуги",
+        faq: "FAQ",
         cv: "CV",
         contact: "Контакты",
       },

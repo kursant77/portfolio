@@ -5,9 +5,11 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 
 // Lazy load components for performance
+const About = React.lazy(() => import('../components/About'));
 const Skills = React.lazy(() => import('../components/Skills'));
 const Projects = React.lazy(() => import('../components/Projects'));
 const Services = React.lazy(() => import('../components/Services'));
+const FAQ = React.lazy(() => import('../components/FAQ'));
 const CV = React.lazy(() => import('../components/CV'));
 const Contact = React.lazy(() => import('../components/Contact'));
 const Footer = React.lazy(() => import('../components/Footer'));
@@ -26,9 +28,11 @@ export default function Home() {
         <Navbar />
         <Hero />
         <Suspense fallback={<LoadingFallback />}>
+          <About />
           <Skills />
           <Projects />
           <Services />
+          <FAQ />
           <CV />
           <Contact />
           <Footer />

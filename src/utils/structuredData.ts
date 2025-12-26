@@ -83,11 +83,35 @@ export interface SiteNavigationElementSchema {
     }>;
 }
 
+export interface WebSiteSchema {
+    '@context': string;
+    '@type': string;
+    url: string;
+    name: string;
+    publisher: {
+        '@type': string;
+        name: string;
+    };
+}
+
+export interface FAQPageSchema {
+    '@context': string;
+    '@type': string;
+    mainEntity: Array<{
+        '@type': string;
+        name: string;
+        acceptedAnswer: {
+            '@type': string;
+            text: string;
+        };
+    }>;
+}
+
 export function generatePersonSchema(
     contactInfo?: ContactInfo | null,
     currentLanguage: string = 'uz'
 ): PersonSchema {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://your-project.vercel.app';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
 
     return {
         '@context': 'https://schema.org',
@@ -143,7 +167,7 @@ export function generateProjectSchema(
     project: Project,
     currentLanguage: string = 'uz'
 ): CreativeWorkSchema {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://your-project.vercel.app';
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
 
     const titleKey = `title_${currentLanguage}` as keyof Project;
     const descKey = `description_${currentLanguage}` as keyof Project;
@@ -234,6 +258,19 @@ export function generateBreadcrumbSchema(baseUrl: string): BreadcrumbListSchema 
     };
 }
 
+export function generateWebSiteSchema(baseUrl: string): WebSiteSchema {
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        url: baseUrl,
+        name: 'Asadbek Jumanazarov - Full Stack Developer',
+        publisher: {
+            '@type': 'Person',
+            name: 'Asadbek Jumanazarov'
+        }
+    };
+}
+
 export function generateNavigationSchema(baseUrl: string): SiteNavigationElementSchema {
     return {
         '@context': 'https://schema.org',
@@ -249,20 +286,72 @@ export function generateNavigationSchema(baseUrl: string): SiteNavigationElement
     };
 }
 
+export function generateFAQSchema(currentLanguage: string = 'uz'): FAQPageSchema {
+    const faqs = {
+        uz: [
+            {
+                q: "Asadbek Jumanazarov kim?",
+                a: "Asadbek Jumanazarov - O'zbekistonning Xorazm viloyati Shovot tumanidan bo'lgan professional Full Stack dasturchi. U React, TypeScript va Node.js texnologiyalari bo'yicha mutaxassis."
+            },
+            {
+                q: "Asadbek Jumanazarov qanday xizmatlarni taklif qiladi?",
+                a: "U veb-saytlar yaratish, CRM tizimlarini ishlab chiqish, Telegram botlar yaratish va e-tijorat loyihalarini amalga oshirish xizmatlarini taklif etadi."
+            },
+            {
+                q: "Asadbek Jumanazarov bilan qanday bog'lanish mumkin?",
+                a: "U bilan +998 90 003 37 23 telefon raqami yoki kursant410@gmail.com elektron pochtasi orqali bog'lanish mumkin."
+            }
+        ],
+        en: [
+            {
+                q: "Who is Asadbek Jumanazarov?",
+                a: "Asadbek Jumanazarov is a professional Full Stack Developer from Shovot, Khorezm region, Uzbekistan. He specializes in React, TypeScript, and Node.js."
+            },
+            {
+                q: "What services does Asadbek Jumanazarov offer?",
+                a: "He offers web development, CRM system development, Telegram bot creation, and e-commerce project implementation."
+            }
+        ],
+        ru: [
+            {
+                q: "Кто такой Асадбек Джуманазаров?",
+                a: "Асадбек Джуманазаров — профессиональный Full Stack разработчик из Шаватского района Хорезмской области, Узбекистан. Специализируется на React, TypeScript и Node.js."
+            }
+        ]
+    };
+
+    const languageFaqs = faqs[currentLanguage as keyof typeof faqs] || faqs.uz;
+
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: languageFaqs.map(faq => ({
+            '@type': 'Question',
+            name: faq.q,
+            acceptedAnswer: {
+                '@type': 'Answer',
+                text: faq.a
+            }
+        }))
+    };
+}
+
 // Combine all schemas for the main page
 export function generateAllStructuredData(
     contactInfo?: ContactInfo | null,
     projects?: Project[],
     services?: Service[],
     currentLanguage: string = 'uz'
-): Array<PersonSchema | ContactPointSchema | ItemListSchema | BreadcrumbListSchema | SiteNavigationElementSchema> {
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://your-project.vercel.app';
+): Array<PersonSchema | ContactPointSchema | ItemListSchema | BreadcrumbListSchema | SiteNavigationElementSchema | WebSiteSchema | FAQPageSchema> {
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://jumanazarov.uz';
 
-    const schemas: Array<PersonSchema | ContactPointSchema | ItemListSchema | BreadcrumbListSchema | SiteNavigationElementSchema> = [
+    const schemas: Array<any> = [
         generatePersonSchema(contactInfo, currentLanguage),
         generateContactPointSchema(contactInfo),
         generateBreadcrumbSchema(baseUrl),
-        generateNavigationSchema(baseUrl)
+        generateNavigationSchema(baseUrl),
+        generateWebSiteSchema(baseUrl),
+        generateFAQSchema(currentLanguage)
     ];
 
     if (projects && projects.length > 0) {
