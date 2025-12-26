@@ -49,7 +49,7 @@ function Skills() {
 
   return (
     <section id="skills" className="relative py-20 bg-white dark:bg-gray-900">
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -79,11 +79,11 @@ function Skills() {
               <p className="mt-4 text-gray-600 dark:text-gray-400">Yuklanmoqda...</p>
             </div>
           ) : (
-            displaySkills.map((skill, index) => (
+            displaySkills.map((skill: any, index: number) => (
               <motion.div
                 key={skill.id || skill.name}
                 variants={itemVariants}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.05,
                   y: -5,
                   transition: { duration: 0.2 }
@@ -93,11 +93,11 @@ function Skills() {
                 <div className={`inline-flex p-3 rounded-lg bg-gradient-to-r ${skill.color} text-white mb-4`}>
                   {getIcon(skill.icon || 'Code')}
                 </div>
-                
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+
+                <h3 itemProp="knowsAbout" className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                   {skill.name}
                 </h3>
-                
+
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2">
                   <motion.div
                     initial={{ width: 0 }}
@@ -107,7 +107,7 @@ function Skills() {
                     className={`h-2 rounded-full bg-gradient-to-r ${skill.color}`}
                   />
                 </div>
-                
+
                 <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                   {skill.level}%
                 </span>

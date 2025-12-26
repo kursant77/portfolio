@@ -19,17 +19,19 @@ export function useSkills() {
         setSkills(cached);
         setLoading(false);
         // Fetch in background to update cache
-        supabase
-          .from('skills')
-          .select('*')
-          .order('created_at', { ascending: false })
+        Promise.resolve(
+          supabase
+            .from('skills')
+            .select('*')
+            .order('created_at', { ascending: false })
+        )
           .then(({ data, error: apiError }) => {
             if (!apiError && data) {
               setSkills(data);
               cache.set('skills', data);
             }
           })
-          .catch((err) => {
+          .catch((err: unknown) => {
             if (import.meta.env.DEV) {
               console.error('Error fetching skills in background:', err);
             }
@@ -82,17 +84,19 @@ export function useProjects() {
         setProjects(cached);
         setLoading(false);
         // Fetch in background to update cache
-        supabase
-          .from('projects')
-          .select('*')
-          .order('created_at', { ascending: false })
+        Promise.resolve(
+          supabase
+            .from('projects')
+            .select('*')
+            .order('created_at', { ascending: false })
+        )
           .then(({ data, error: apiError }) => {
             if (!apiError && data) {
               setProjects(data);
               cache.set('projects', data);
             }
           })
-          .catch((err) => {
+          .catch((err: unknown) => {
             if (import.meta.env.DEV) {
               console.error('Error fetching projects in background:', err);
             }
@@ -145,17 +149,19 @@ export function useServices() {
         setServices(cached);
         setLoading(false);
         // Fetch in background to update cache
-        supabase
-          .from('services')
-          .select('*')
-          .order('created_at', { ascending: false })
+        Promise.resolve(
+          supabase
+            .from('services')
+            .select('*')
+            .order('created_at', { ascending: false })
+        )
           .then(({ data, error: apiError }) => {
             if (!apiError && data) {
               setServices(data);
               cache.set('services', data);
             }
           })
-          .catch((err) => {
+          .catch((err: unknown) => {
             if (import.meta.env.DEV) {
               console.error('Error fetching services in background:', err);
             }
@@ -208,18 +214,20 @@ export function useContactInfo() {
         setContactInfo(cached);
         setLoading(false);
         // Fetch in background to update cache
-        supabase
-          .from('contact_info')
-          .select('*')
-          .limit(1)
-          .single()
+        Promise.resolve(
+          supabase
+            .from('contact_info')
+            .select('*')
+            .limit(1)
+            .single()
+        )
           .then(({ data, error: apiError }) => {
             if (!apiError && data) {
               setContactInfo(data);
               cache.set('contact_info', data);
             }
           })
-          .catch((err) => {
+          .catch((err: unknown) => {
             if (import.meta.env.DEV) {
               console.error('Error fetching contact info in background:', err);
             }
@@ -273,18 +281,20 @@ export function useCVInfo() {
         setCvInfo(cached);
         setLoading(false);
         // Fetch in background to update cache
-        supabase
-          .from('cv_info')
-          .select('*')
-          .limit(1)
-          .single()
+        Promise.resolve(
+          supabase
+            .from('cv_info')
+            .select('*')
+            .limit(1)
+            .single()
+        )
           .then(({ data, error: apiError }) => {
             if (!apiError && data) {
               setCvInfo(data);
               cache.set('cv_info', data);
             }
           })
-          .catch((err) => {
+          .catch((err: unknown) => {
             if (import.meta.env.DEV) {
               console.error('Error fetching CV info in background:', err);
             }

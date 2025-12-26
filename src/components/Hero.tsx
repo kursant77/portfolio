@@ -23,6 +23,8 @@ export default function Hero() {
   return (
     <section
       id="hero"
+      itemScope
+      itemType="https://schema.org/Person"
       className="relative min-h-screen flex items-center justify-center pt-20 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
     >
       <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,6 +40,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
+              itemProp="name"
               className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4"
             >
               {t("hero.name")}
@@ -47,6 +50,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
+              itemProp="jobTitle"
               className="text-2xl md:text-3xl font-semibold text-blue-600 dark:text-blue-400 mb-6"
             >
               {t("hero.title")}
@@ -56,6 +60,7 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
+              itemProp="description"
               className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-xl"
             >
               {t("hero.bio")}
@@ -121,6 +126,7 @@ export default function Hero() {
                 {/* 👉 Shu yerga rasm qo‘yiladi */}
                 <img
                   loading="lazy"
+                  itemProp="image"
                   src="/me.png" // public/me.png faylingni joylashtir
                   alt="Asadbek Jumanazarov"
                   className="w-full h-full object-cover rounded-full"

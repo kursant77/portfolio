@@ -84,11 +84,14 @@ function Projects() {
                   key={project.id}
                   variants={itemVariants}
                   whileHover={{ y: -10, scale: 1.02 }}
+                  itemScope
+                  itemType="https://schema.org/CreativeWork"
                   className="bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group"
                 >
                   <div className="relative group">
                     <img
                       loading="lazy"
+                      itemProp="image"
                       src={project.image}
                       alt={title}
                       className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
@@ -99,6 +102,7 @@ function Projects() {
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                           href={project.demo_url}
+                          itemProp="url"
                           className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
                           target="_blank"
                           rel="noopener noreferrer"
@@ -120,10 +124,10 @@ function Projects() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    <h3 itemProp="name" className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
                       {title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p itemProp="description" className="text-gray-600 dark:text-gray-400 mb-4">
                       {description}
                     </p>
 

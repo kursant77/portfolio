@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import SEOHead from '../components/SEOHead';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 
@@ -20,6 +21,7 @@ const LoadingFallback = () => (
 export default function Home() {
   return (
     <ThemeProvider>
+      <SEOHead />
       <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
         <Navbar />
         <Hero />

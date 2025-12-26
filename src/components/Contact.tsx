@@ -16,18 +16,18 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const submitPromise = supabase.from('contact_messages').insert([formData]);
-    
+    const submitPromise = Promise.resolve(supabase.from('contact_messages').insert([formData]));
+
     toast.promise(submitPromise, {
       loading: 'Yuborilmoqda...',
-      success: (result) => {
+      success: (result: any) => {
         if (result.error) {
           throw new Error(result.error.message);
         }
         setFormData({ name: '', email: '', message: '' });
         return 'Xabar yuborildi! Tez orada javob beraman.';
       },
-      error: (error) => `Xatolik yuz berdi. Iltimos, qayta urinib ko'ring. ${error?.message || ''}`,
+      error: (error: any) => `Xatolik yuz berdi. Iltimos, qayta urinib ko'ring. ${error?.message || ''}`,
     });
   };
 
@@ -63,7 +63,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="relative py-20 bg-white dark:bg-gray-900">
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -157,11 +157,11 @@ export default function Contact() {
             viewport={{ once: true }}
             className="space-y-8"
           >
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6" itemScope itemType="https://schema.org/ContactPoint">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 {t('contact.phone')}
               </h3>
-              
+
               <div className="space-y-4">
                 <motion.div
                   whileHover={{ x: 10 }}
@@ -172,7 +172,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Phone</p>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-gray-400" itemProp="telephone">
                       {contactLoading ? 'Yuklanmoqda...' : (contactInfo?.phone || '+998 90 003 37 23')}
                     </p>
                   </div>
@@ -187,7 +187,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">Email</p>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-gray-600 dark:text-gray-400" itemProp="email">
                       {contactLoading ? 'Yuklanmoqda...' : (contactInfo?.email || 'kursant410@gmail.com')}
                     </p>
                   </div>
@@ -199,7 +199,7 @@ export default function Contact() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                 {t('contact.social')}
               </h3>
-              
+
               <div className="flex space-x-4">
                 {socialLinks.map((social) => (
                   <motion.a

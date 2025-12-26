@@ -39,7 +39,7 @@ function Services() {
 
   return (
     <section id="services" className="relative py-20 bg-white dark:bg-gray-900">
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -73,22 +73,24 @@ function Services() {
               <motion.div
                 key={service.id}
                 variants={itemVariants}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.05,
                   y: -10,
                   transition: { duration: 0.2 }
                 }}
+                itemScope
+                itemType="https://schema.org/Service"
                 className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover:shadow-2xl border border-gray-100 dark:border-gray-700 transition-all duration-300 group"
               >
                 <div className={`inline-flex p-4 rounded-xl bg-gradient-to-r ${service.color} text-white mb-6`}>
                   {getIcon(service.icon || 'Code')}
                 </div>
-                
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+
+                <h3 itemProp="serviceType" className="text-xl font-bold text-gray-900 dark:text-white mb-4">
                   {getTitle(service)}
                 </h3>
-                
-                <p className="text-gray-600 dark:text-gray-400">
+
+                <p itemProp="description" className="text-gray-600 dark:text-gray-400">
                   {t(`services.${service.key}.description`, { defaultValue: '' })}
                 </p>
               </motion.div>
