@@ -15,6 +15,7 @@ export default function Navbar() {
     { key: 'skills', href: '#skills' },
     { key: 'projects', href: '#projects' },
     { key: 'services', href: '#services' },
+    { key: 'faq', href: '#faq' },
     { key: 'cv', href: '#cv' },
     { key: 'contact', href: '#contact' }
   ];
