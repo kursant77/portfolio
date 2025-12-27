@@ -219,7 +219,7 @@ export default function Navbar() {
                   }}
                   onClick={() => scrollToSection(item.href)}
                   className={`group w-full flex items-center justify-between p-4.5 rounded-2xl transition-all duration-300 ${isActive
-                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 py-2'
+                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 p-2'
                     : 'hover:bg-gray-100 dark:hover:bg-white/5'
                     }`}
                 >
