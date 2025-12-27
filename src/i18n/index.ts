@@ -107,7 +107,7 @@ const resources = {
   uz: {
     translation: {
       nav: {
-        home: "Bosh sahifa",
+        home: "Asosiy",
         about: "Men haqimda",
         skills: "Ko'nikmalar",
         projects: "Loyihalar",

@@ -11,6 +11,7 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = React.useState('hero');
 
   const navItems = [
+    { key: 'home', href: '#hero', icon: Home },
     { key: 'about', href: '#about', icon: User },
     { key: 'skills', href: '#skills', icon: Zap },
     { key: 'projects', href: '#projects', icon: Briefcase },
@@ -70,7 +71,7 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-8 py-8 pointer-events-none"
     >
       <div className="max-w-[100%] xl:max-w-7xl mx-auto pointer-events-auto">
-        <div className="bg-white/10 dark:bg-[#0f172a]/40 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] px-6 md:px-10 py-4 flex justify-between items-center relative overflow-hidden group/nav">
+        <div className="bg-white/10 dark:bg-[#0f172a]/40 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] px-4 md:px-10 py-4 flex justify-between items-center relative overflow-hidden group/nav">
           {/* Decorative background pulse */}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-purple-600/10 opacity-0 group-hover/nav:opacity-100 transition-opacity duration-700 -z-10" />
 
@@ -89,13 +90,13 @@ export default function Navbar() {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center space-x-2 xl:space-x-6 mx-4">
+          <div className="hidden lg:flex items-center justify-center space-x-1 xl:space-x-4 mx-2">
             {navItems.map((item) => (
               <motion.button
                 key={item.key}
                 whileHover={{ y: -2 }}
                 onClick={() => scrollToSection(item.href)}
-                className={`px-4 py-2 text-[13px] xl:text-[14px] font-black transition-all duration-300 uppercase tracking-[0.1em] relative group whitespace-nowrap ${activeSection === item.href.replace('#', '')
+                className={`px-3 py-2 text-[12px] xl:text-[13px] font-black transition-all duration-300 uppercase tracking-tight relative group whitespace-nowrap ${activeSection === item.href.replace('#', '')
                   ? 'text-blue-600 dark:text-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
@@ -108,14 +109,14 @@ export default function Navbar() {
           </div>
 
           {/* Controls */}
-          <div className="flex items-center space-x-3 md:space-x-5 flex-shrink-0">
+          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             {/* Language Selector */}
-            <div className="flex items-center bg-gray-100/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl px-3 py-1.5 border border-white/20 dark:border-white/5 shadow-inner">
-              <Globe className="h-4 w-4 text-gray-500 mr-2" />
+            <div className="flex items-center bg-gray-100/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl px-2 py-1.5 border border-white/20 dark:border-white/5 shadow-inner">
+              <Globe className="h-3.5 w-3.5 text-gray-500 mr-1.5" />
               <select
                 value={i18n.language}
                 onChange={(e) => i18n.changeLanguage(e.target.value)}
-                className="bg-transparent text-gray-900 dark:text-white border-none font-black text-xs focus:ring-0 cursor-pointer hover:text-blue-500 transition-colors py-0.5 appearance-none pr-0"
+                className="bg-transparent text-gray-900 dark:text-white border-none font-black text-[10px] focus:ring-0 cursor-pointer hover:text-blue-500 transition-colors py-0.5 appearance-none pr-0"
               >
                 {languages.map((lang) => (
                   <option key={lang.code} value={lang.code} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
@@ -130,18 +131,18 @@ export default function Navbar() {
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
-              className="p-3 rounded-2xl bg-gray-100/30 dark:bg-gray-800/30 text-gray-900 dark:text-white hover:shadow-2xl transition-all border border-white/20 dark:border-white/5 backdrop-blur-md"
+              className="p-2.5 rounded-2xl bg-gray-100/30 dark:bg-gray-800/30 text-gray-900 dark:text-white hover:shadow-2xl transition-all border border-white/20 dark:border-white/5 backdrop-blur-md"
             >
-              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+              {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
             </motion.button>
 
             {/* Mobile Menu Toggle */}
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-3 rounded-2xl bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-600/20"
+              className="lg:hidden p-2.5 rounded-2xl bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-600/20"
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-5 w-5" />
             </motion.button>
           </div>
         </div>
@@ -190,10 +191,10 @@ export default function Navbar() {
 
         {/* Mobile Menu Content */}
         <div className="flex-1 px-6 py-8 flex flex-col">
-          <div className="space-y-3">
+          <div className="space-y-4">
             {navItems.map((item, idx) => {
               const Icon = item.icon;
-              const isActive = activeSection === item.href.replace('#', '');
+              const isActive = activeSection === item.href.replace('#', '') || (item.key === 'home' && activeSection === 'hero');
 
               return (
                 <motion.button
@@ -203,19 +204,19 @@ export default function Navbar() {
                     closed: { x: 20, opacity: 0 }
                   }}
                   onClick={() => scrollToSection(item.href)}
-                  className={`group w-full flex items-center justify-between p-3 rounded-2xl transition-all duration-300 ${isActive
-                    ? 'bg-blue-600/10 dark:bg-blue-600/20 shadow-[0_0_20px_rgba(37,99,235,0.1)] border border-blue-600/20'
-                    : 'hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent'
+                  className={`group w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${isActive
+                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20'
+                    : 'hover:bg-gray-100 dark:hover:bg-white/5'
                     }`}
                 >
                   <div className="flex items-center space-x-4">
                     <div className={`p-2.5 rounded-xl transition-all duration-300 ${isActive
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-                      : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-gray-300 dark:group-hover:bg-gray-700'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                       }`}>
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className={`text-base font-bold transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
+                    <span className={`text-base font-black transition-colors ${isActive ? 'text-white' : 'text-gray-700 dark:text-gray-300'
                       }`}>
                       {t(`nav.${item.key}`)}
                     </span>
@@ -223,7 +224,7 @@ export default function Navbar() {
                   {isActive && (
                     <motion.div
                       layoutId="activeDot"
-                      className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)]"
+                      className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"
                     />
                   )}
                 </motion.button>
