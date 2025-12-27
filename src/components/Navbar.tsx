@@ -29,40 +29,42 @@ export default function Navbar() {
   React.useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '-20% 0px -70% 0px', // Adjusted to trigger when section is in the upper part of the screen
-      threshold: [0, 0.1, 0.2, 0.3]
+      rootMargin: '-80px 0px -60% 0px', // Header balandligidan boshlab, ekranning yuqori qismini kuzatamiz
+      threshold: 0
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        const navIds = navItems.map(item => item.href.replace('#', ''));
-        if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
+        if (entry.isIntersecting) {
           const sectionId = entry.target.id;
-          if (navIds.includes(sectionId) || sectionId === 'hero') {
-            setActiveSection(sectionId);
+          // Check if the sectionId corresponds to a navigation item's href (after removing '#')
+          const isNavSection = navItems.some(item => item.href.replace('#', '') === sectionId);
+          if (isNavSection) {
+            // Use functional update to avoid stale state
+            setActiveSection(prevActiveSection => {
+              if (prevActiveSection !== sectionId) {
+                return sectionId;
+              }
+              return prevActiveSection;
+            });
           }
         }
       });
     }, observerOptions);
 
     const observeSections = () => {
-      const sections = document.querySelectorAll('section[id]');
-      sections.forEach((section) => {
-        observer.unobserve(section); // Avoid multiple observations
+      document.querySelectorAll('section[id]').forEach((section) => {
+        observer.unobserve(section);
         observer.observe(section);
       });
     };
 
     observeSections();
-
-    // Fallback for dynamic content and initial load
-    const refreshTimer = setTimeout(observeSections, 1000);
-    const refreshTimer2 = setTimeout(observeSections, 3000);
+    const timers = [1000, 3000].map(ms => setTimeout(observeSections, ms));
 
     return () => {
       observer.disconnect();
-      clearTimeout(refreshTimer);
-      clearTimeout(refreshTimer2);
+      timers.forEach(clearTimeout);
     };
   }, []);
 
@@ -113,7 +115,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center justify-center space-x-1 xl:space-x-4 mx-2">
             {navItems.map((item) => {
-              const isActive = activeSection === item.href.replace('#', '') || (item.key === 'home' && activeSection === 'hero');
+              const isActive = activeSection === item.href.replace('#', '');
               return (
                 <motion.button
                   key={item.key}
@@ -226,7 +228,7 @@ export default function Navbar() {
           <div className="space-y-4">
             {navItems.map((item, idx) => {
               const Icon = item.icon;
-              const isActive = activeSection === item.href.replace('#', '') || (item.key === 'home' && activeSection === 'hero');
+              const isActive = activeSection === item.href.replace('#', '');
 
               return (
                 <motion.button
