@@ -16,8 +16,8 @@ const resources = {
       },
       hero: {
         name: "Asadbek Jumanazarov",
-        title: "Frontend Developer",
-        bio: "I am a frontend developer who creates modern and efficient websites.",
+        title: "Full Stack Developer",
+        bio: "I am a full stack developer who creates modern and efficient websites.",
         contactMe: "Contact Me",
         viewProjects: "View Projects",
         downloadCV: "Download CV",
@@ -118,8 +118,8 @@ const resources = {
       },
       hero: {
         name: "Asadbek Jumanazarov",
-        title: "Frontend Dasturchi",
-        bio: "Men zamonaviy va samarali websaytlar yaratadigan frontend dasturchiman.",
+        title: "Full Stack Dasturchi",
+        bio: "Men zamonaviy va samarali websaytlar yaratadigan full stack dasturchiman.",
         contactMe: "Aloqaga chiqish",
         viewProjects: "Loyihalarni ko'rish",
         downloadCV: "CV yuklab olish",
@@ -221,8 +221,8 @@ const resources = {
       },
       hero: {
         name: "Асадбек Жуманазаров",
-        title: "Frontend Разработчик",
-        bio: "Я frontend разработчик, создающий современные и эффективные веб-сайты.",
+        title: "Full Stack Разработчик",
+        bio: "Я full stack разработчик, создающий современные и эффективные веб-сайты.",
         contactMe: "Связаться со мной",
         viewProjects: "Посмотреть проекты",
         downloadCV: "Скачать CV",

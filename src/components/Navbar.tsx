@@ -35,14 +35,25 @@ export default function Navbar() {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
 
-    document.querySelectorAll('section[id]').forEach((section) => {
-      observer.observe(section);
-    });
+    const observeSections = () => {
+      document.querySelectorAll('section[id]').forEach((section) => {
+        observer.observe(section);
+      });
+    };
 
-    return () => observer.disconnect();
+    observeSections();
+    // Rescan for lazy-loaded components
+    const timer = setTimeout(observeSections, 1500);
+    const timer2 = setTimeout(observeSections, 4000);
+
+    return () => {
+      observer.disconnect();
+      clearTimeout(timer);
+      clearTimeout(timer2);
+    };
   }, []);
 
   const scrollToSection = (href: string) => {
@@ -91,21 +102,24 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center justify-center space-x-1 xl:space-x-4 mx-2">
-            {navItems.map((item) => (
-              <motion.button
-                key={item.key}
-                whileHover={{ y: -2 }}
-                onClick={() => scrollToSection(item.href)}
-                className={`px-3 py-2 text-[12px] xl:text-[13px] font-black transition-all duration-300 uppercase tracking-tight relative group whitespace-nowrap ${activeSection === item.href.replace('#', '')
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
-                  }`}
-              >
-                {t(`nav.${item.key}`)}
-                <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 transition-all duration-300 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)] ${activeSection === item.href.replace('#', '') ? 'w-2/3' : 'w-0 group-hover:w-2/3'
-                  }`} />
-              </motion.button>
-            ))}
+            {navItems.map((item) => {
+              const isActive = activeSection === item.href.replace('#', '') || (item.key === 'home' && activeSection === 'hero');
+              return (
+                <motion.button
+                  key={item.key}
+                  whileHover={{ y: -2 }}
+                  onClick={() => scrollToSection(item.href)}
+                  className={`px-3 py-2 text-[14px] xl:text-[15px] font-black transition-all duration-300 uppercase tracking-tight relative group whitespace-nowrap ${isActive
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                    }`}
+                >
+                  {t(`nav.${item.key}`)}
+                  <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 transition-all duration-300 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)] ${isActive ? 'w-2/3' : 'w-0 group-hover:w-2/3'
+                    }`} />
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Controls */}
@@ -204,19 +218,19 @@ export default function Navbar() {
                     closed: { x: 20, opacity: 0 }
                   }}
                   onClick={() => scrollToSection(item.href)}
-                  className={`group w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${isActive
+                  className={`group w-full flex items-center justify-between p-4.5 rounded-2xl transition-all duration-300 ${isActive
                     ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20'
                     : 'hover:bg-gray-100 dark:hover:bg-white/5'
                     }`}
                 >
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-2.5 rounded-xl transition-all duration-300 ${isActive
+                  <div className="flex items-center space-x-5">
+                    <div className={`p-3 rounded-xl transition-all duration-300 ${isActive
                       ? 'bg-white/20 text-white'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                       }`}>
-                      <Icon className="h-5 w-5" />
+                      <Icon className="h-6 w-6" />
                     </div>
-                    <span className={`text-base font-black transition-colors ${isActive ? 'text-white' : 'text-gray-700 dark:text-gray-300'
+                    <span className={`text-lg font-black transition-colors ${isActive ? 'text-white' : 'text-gray-700 dark:text-gray-300'
                       }`}>
                       {t(`nav.${item.key}`)}
                     </span>

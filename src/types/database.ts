@@ -81,3 +81,16 @@ export interface ContactMessage {
   created_at?: string;
 }
 
+export interface FAQ {
+  id: string;
+  question_en: string;
+  question_uz: string;
+  question_ru: string;
+  answer_en: string;
+  answer_uz: string;
+  answer_ru: string;
+  order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+

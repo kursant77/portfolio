@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
-import { Skill, Project, Service, ContactInfo, CVInfo, AboutSection } from '../types/database';
+import { Skill, Project, Service, ContactInfo, CVInfo, AboutSection, FAQ, ContactMessage } from '../types/database';
 import { cache } from '../utils/cache';
 
 export function useSkills() {
@@ -397,4 +397,68 @@ export function useAboutSection() {
   }, [fetchAboutData]);
 
   return { aboutData, loading, error, refetch: fetchAboutData };
+}
+
+export function useFAQs() {
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  const fetchFAQs = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check cache first
+      const cached = cache.get<FAQ[]>('faqs');
+      if (cached) {
+        setFaqs(cached);
+        setLoading(false);
+        // Fetch in background to update cache
+        Promise.resolve(
+          supabase
+            .from('faqs')
+            .select('*')
+            .order('order', { ascending: true })
+        )
+          .then(({ data, error: apiError }) => {
+            if (!apiError && data) {
+              setFaqs(data);
+              cache.set('faqs', data);
+            }
+          })
+          .catch((err: unknown) => {
+            if (import.meta.env.DEV) {
+              console.error('Error fetching FAQs in background:', err);
+            }
+          });
+        return;
+      }
+
+      const { data, error: apiError } = await supabase
+        .from('faqs')
+        .select('*')
+        .order('order', { ascending: true });
+
+      if (apiError) throw apiError;
+
+      if (data) {
+        setFaqs(data);
+        cache.set('faqs', data);
+      }
+    } catch (err) {
+      if (import.meta.env.DEV) {
+        console.error('Error fetching FAQs:', err);
+      }
+      setError(err instanceof Error ? err : new Error('Failed to fetch FAQs'));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchFAQs();
+  }, [fetchFAQs]);
+
+  return { faqs, loading, error, refetch: fetchFAQs };
 }

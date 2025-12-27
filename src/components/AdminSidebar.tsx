@@ -14,14 +14,15 @@ import {
   Sun,
   Moon,
   ChevronRight,
-  User
+  User,
+  HelpCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface AdminSidebarProps {
-  activeTab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about';
-  setActiveTab: (tab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about') => void;
+  activeTab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about' | 'faq';
+  setActiveTab: (tab: 'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about' | 'faq') => void;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   onSignOut: () => void;
@@ -32,6 +33,7 @@ interface AdminSidebarProps {
     contact: number;
     cv: number;
     about: number;
+    faq: number;
   };
 }
 
@@ -49,6 +51,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
     { key: 'projects', label: 'Projects', icon: FolderKanban, count: counts.projects },
     { key: 'services', label: 'Services', icon: Briefcase, count: counts.services },
     { key: 'cv', label: 'CV', icon: FileText, count: counts.cv },
+    { key: 'faq', label: 'FAQ', icon: HelpCircle, count: counts.faq },
     { key: 'contact', label: 'Contact', icon: MessageSquare, count: counts.contact },
   ];
 
@@ -120,8 +123,8 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                         setIsOpen(false);
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
-                          : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'
+                        : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                         }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -157,8 +160,8 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                         setIsOpen(false);
                       }}
                       className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 ${isActive
-                          ? 'bg-gray-700 text-white'
-                          : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
+                        ? 'bg-gray-700 text-white'
+                        : 'text-gray-300 hover:bg-gray-700/50 hover:text-white'
                         }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -167,8 +170,8 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, setIsOpe
                       </div>
                       {item.count !== undefined && (
                         <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${isActive
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-blue-600/20 text-blue-400'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-blue-600/20 text-blue-400'
                           }`}>
                           {item.count}
                         </span>

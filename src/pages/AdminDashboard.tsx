@@ -28,9 +28,11 @@ import {
   LayoutDashboard,
   Download,
   Eye,
-  User
+  User,
+  HelpCircle,
+  ChevronDown
 } from 'lucide-react';
-import { Skill, Project, Service, ContactInfo, CVInfo, AboutSection } from '../types/database';
+import { Skill, Project, Service, ContactInfo, CVInfo, AboutSection, FAQ } from '../types/database';
 import AdminModal from '../components/AdminModal';
 import { uploadImage, getImagePreview } from '../utils/imageUpload';
 import { getColorByIcon } from '../utils/colorGenerator';
@@ -40,7 +42,7 @@ function AdminDashboardContent() {
   const { user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about' | 'faq'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // Data states
@@ -50,6 +52,7 @@ function AdminDashboardContent() {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null);
   const [cvInfo, setCvInfo] = useState<CVInfo | null>(null);
   const [aboutData, setAboutData] = useState<AboutSection | null>(null);
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
 
   // Loading states
   const [loading, setLoading] = useState(true);
@@ -86,6 +89,7 @@ function AdminDashboardContent() {
         fetchContactInfo(),
         fetchCVInfo(),
         fetchAboutData(),
+        fetchFAQs(),
       ]);
     } finally {
       setLoading(false);
@@ -194,6 +198,23 @@ function AdminDashboardContent() {
     }
   };
 
+  const fetchFAQs = async () => {
+    try {
+      const { data, error } = await supabase.from('faqs').select('*').order('order', { ascending: true });
+      if (error) {
+        if (import.meta.env.DEV) {
+          console.error('Error fetching FAQs:', error);
+        }
+      } else if (data) {
+        setFaqs(data);
+      }
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Unexpected error fetching FAQs:', error);
+      }
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/admin/login');
@@ -246,6 +267,7 @@ function AdminDashboardContent() {
           contact: contactInfo ? 1 : 0,
           cv: cvInfo ? 1 : 0,
           about: aboutData ? 1 : 0,
+          faq: faqs.length,
         }}
       />
 
@@ -297,6 +319,7 @@ function AdminDashboardContent() {
               contactInfo={contactInfo}
               cvInfo={cvInfo}
               aboutData={aboutData}
+              faqs={faqs}
               onNavigate={(tab) => setActiveTab(tab)}
             />
           ) : (
@@ -342,6 +365,13 @@ function AdminDashboardContent() {
                   onRefresh={fetchAboutData}
                 />
               )}
+              {activeTab === 'faq' && (
+                <FAQsTab
+                  faqs={faqs}
+                  onRefresh={fetchFAQs}
+                  onDelete={(id) => handleDelete('faqs', id)}
+                />
+              )}
             </>
           )}
         </main>
@@ -358,6 +388,7 @@ function DashboardView({
   contactInfo,
   cvInfo,
   aboutData,
+  faqs,
   onNavigate,
 }: {
   skills: Skill[];
@@ -366,7 +397,8 @@ function DashboardView({
   contactInfo: ContactInfo | null;
   cvInfo: CVInfo | null;
   aboutData: AboutSection | null;
-  onNavigate: (tab: 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about') => void;
+  faqs: FAQ[];
+  onNavigate: (tab: 'skills' | 'projects' | 'services' | 'contact' | 'cv' | 'about' | 'faq') => void;
 }) {
   return (
     <div>
@@ -464,6 +496,20 @@ function DashboardView({
             <p className="text-xs text-gray-500">About information</p>
           </div>
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="bg-gray-800 rounded-lg shadow-lg p-5 border border-gray-700 hover:border-pink-500 transition-colors cursor-pointer"
+          onClick={() => onNavigate('faq')}
+        >
+          <div>
+            <p className="text-xs text-gray-400 mb-1">FAQ</p>
+            <p className="text-2xl font-bold text-white mb-2">{faqs.length}</p>
+            <p className="text-xs text-gray-500">Total questions</p>
+          </div>
+        </motion.div>
       </div>
 
       {/* Additional Stats or Quick Actions */}
@@ -493,6 +539,15 @@ function DashboardView({
             >
               <span className="text-white">Skills boshqaruvi</span>
               <span className="text-gray-400">{skills.length} ta</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onNavigate('faq')}
+              className="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors flex items-center justify-between"
+            >
+              <span className="text-white">FAQ boshqaruvi</span>
+              <span className="text-gray-400">{faqs.length} ta</span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -1711,7 +1766,7 @@ function CVTab({
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 disabled={!editing}
                 className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white disabled:bg-gray-600 disabled:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Frontend Developer"
+                placeholder="Full Stack Developer"
               />
             </div>
 
@@ -2008,6 +2063,243 @@ function AboutTab({ aboutData, onRefresh }: { aboutData: AboutSection | null; on
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// FAQs Tab Component
+function FAQsTab({ faqs, onRefresh, onDelete }: { faqs: FAQ[]; onRefresh: () => void; onDelete: (id: string) => void }) {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<Partial<FAQ>>({
+    question_en: '', question_uz: '', question_ru: '',
+    answer_en: '', answer_uz: '', answer_ru: '',
+    order: 0
+  });
+
+  const handleEdit = (faq: FAQ) => {
+    setEditingId(faq.id);
+    setFormData(faq);
+    setShowAddModal(true);
+  };
+
+  const handleSave = async () => {
+    if (!formData.question_uz || !formData.answer_uz) {
+      toast.error('Iltimos, Savol (UZ) va Javob (UZ) maydonlarini to\'ldiring!');
+      return;
+    }
+
+    try {
+      if (editingId) {
+        const updatePromise = (async () => {
+          const { error } = await supabase.from('faqs').update(formData).eq('id', editingId);
+          if (error) throw error;
+        })();
+
+        toast.promise(updatePromise, {
+          loading: 'Yangilanmoqda...',
+          success: () => {
+            cache.clear('faqs');
+            setShowAddModal(false);
+            setEditingId(null);
+            setFormData({
+              question_en: '', question_uz: '', question_ru: '',
+              answer_en: '', answer_uz: '', answer_ru: '',
+              order: 0
+            });
+            onRefresh();
+            return 'FAQ muvaffaqiyatli yangilandi!';
+          },
+          error: (error) => `FAQ yangilashda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
+      } else {
+        const insertPromise = (async () => {
+          const { error } = await supabase.from('faqs').insert([formData]);
+          if (error) throw error;
+        })();
+
+        toast.promise(insertPromise, {
+          loading: 'Qo\'shilmoqda...',
+          success: () => {
+            cache.clear('faqs');
+            setShowAddModal(false);
+            setFormData({
+              question_en: '', question_uz: '', question_ru: '',
+              answer_en: '', answer_uz: '', answer_ru: '',
+              order: 0
+            });
+            onRefresh();
+            return 'FAQ muvaffaqiyatli qo\'shildi!';
+          },
+          error: (error) => `FAQ qo'shishda xatolik: ${error?.message || 'Noma\'lum xatolik'}`,
+        });
+      }
+    } catch (error: any) {
+      toast.error('Xatolik yuz berdi: ' + (error?.message || 'Noma\'lum xatolik'));
+    }
+  };
+
+  const handleCancel = () => {
+    setShowAddModal(false);
+    setEditingId(null);
+    setFormData({
+      question_en: '', question_uz: '', question_ru: '',
+      answer_en: '', answer_uz: '', answer_ru: '',
+      order: 0
+    });
+  };
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold text-white">FAQ Boshqaruvi</h2>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            setShowAddModal(true);
+            setEditingId(null);
+            setFormData({
+              question_en: '', question_uz: '', question_ru: '',
+              answer_en: '', answer_uz: '', answer_ru: '',
+              order: faqs.length
+            });
+          }}
+          className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Yangi Savol
+        </motion.button>
+      </div>
+
+      <AdminModal
+        isOpen={showAddModal}
+        onClose={handleCancel}
+        title={editingId ? 'FAQ Tahrirlash' : 'Yangi FAQ Qo\'shish'}
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-blue-400">Savollar (Questions)</h3>
+              <input
+                type="text"
+                placeholder="Savol (UZ)"
+                value={formData.question_uz}
+                onChange={(e) => setFormData({ ...formData, question_uz: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Question (EN)"
+                value={formData.question_en}
+                onChange={(e) => setFormData({ ...formData, question_en: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
+              />
+              <input
+                type="text"
+                placeholder="Вопрос (RU)"
+                value={formData.question_ru}
+                onChange={(e) => setFormData({ ...formData, question_ru: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
+              />
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-purple-400">Javoblar (Answers)</h3>
+              <textarea
+                placeholder="Javob (UZ)"
+                value={formData.answer_uz}
+                onChange={(e) => setFormData({ ...formData, answer_uz: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white h-10 min-h-[42px]"
+              />
+              <textarea
+                placeholder="Answer (EN)"
+                value={formData.answer_en}
+                onChange={(e) => setFormData({ ...formData, answer_en: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white h-10 min-h-[42px]"
+              />
+              <textarea
+                placeholder="Ответ (RU)"
+                value={formData.answer_ru}
+                onChange={(e) => setFormData({ ...formData, answer_ru: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white h-10 min-h-[42px]"
+              />
+            </div>
+          </div>
+          <input
+            type="number"
+            placeholder="Tartib (Order)"
+            value={formData.order}
+            onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+            className="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-white"
+          />
+        </div>
+        <div className="flex justify-end space-x-3 mt-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleCancel}
+            className="px-6 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-600"
+          >
+            Bekor qilish
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleSave}
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 shadow-lg"
+          >
+            {editingId ? 'Yangilash' : 'Qo\'shish'}
+          </motion.button>
+        </div>
+      </AdminModal>
+
+      <div className="space-y-4">
+        {faqs.length === 0 ? (
+          <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700">
+            <p className="text-gray-400">Hozircha savollar yo'q</p>
+          </div>
+        ) : (
+          faqs.map((faq) => (
+            <motion.div
+              key={faq.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 bg-gray-800 rounded-xl border border-gray-700 shadow-md hover:border-blue-500 transition-all group"
+            >
+              <div className="flex justify-between items-start gap-4">
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 bg-blue-600/20 text-blue-400 rounded text-xs font-bold">#{faq.order}</span>
+                    <h3 className="font-bold text-white text-lg">{faq.question_uz}</h3>
+                  </div>
+                  <p className="text-gray-400 text-sm italic">{faq.question_en || 'No English Translation'}</p>
+                  <div className="mt-4 p-4 bg-gray-900 rounded-lg border border-gray-700/50">
+                    <p className="text-gray-300 text-sm line-clamp-2">{faq.answer_uz}</p>
+                  </div>
+                </div>
+                <div className="flex space-x-2 shrink-0">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleEdit(faq)}
+                    className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => onDelete(faq.id)}
+                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          ))
+        )}
       </div>
     </div>
   );

@@ -138,7 +138,6 @@ export function generatePersonSchema(
             'Node.js',
             'Full Stack Development',
             'Web Development',
-            'Frontend Development',
             'Backend Development',
             'Supabase',
             'PostgreSQL',
