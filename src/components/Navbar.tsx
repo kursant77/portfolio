@@ -4,55 +4,65 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { Moon, Sun, Menu, X, Code, Home, User, Zap, Briefcase, Settings, MessageCircle, FileText, Mail, Globe } from 'lucide-react';
 
+const navItems = [
+  { key: 'home', href: '#hero', icon: Home },
+  { key: 'about', href: '#about', icon: User },
+  { key: 'skills', href: '#skills', icon: Zap },
+  { key: 'projects', href: '#projects', icon: Briefcase },
+  { key: 'services', href: '#services', icon: Settings },
+  { key: 'contact', href: '#contact', icon: Mail }
+];
+
+const languages = [
+  { code: 'uz', name: 'UZ' },
+  { code: 'en', name: 'EN' },
+  { code: 'ru', name: 'RU' }
+];
+
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = React.useState('hero');
 
-  const navItems = [
-    { key: 'home', href: '#hero', icon: Home },
-    { key: 'about', href: '#about', icon: User },
-    { key: 'skills', href: '#skills', icon: Zap },
-    { key: 'projects', href: '#projects', icon: Briefcase },
-    { key: 'services', href: '#services', icon: Settings },
-    { key: 'contact', href: '#contact', icon: Mail }
-  ];
-
-  const languages = [
-    { code: 'uz', name: 'UZ' },
-    { code: 'en', name: 'EN' },
-    { code: 'ru', name: 'RU' }
-  ];
-
   // Intersection Observer to track active section
   React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+    const observerOptions = {
+      root: null,
+      rootMargin: '-20% 0px -70% 0px', // Adjusted to trigger when section is in the upper part of the screen
+      threshold: [0, 0.1, 0.2, 0.3]
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const navIds = navItems.map(item => item.href.replace('#', ''));
+        if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
+          const sectionId = entry.target.id;
+          if (navIds.includes(sectionId) || sectionId === 'hero') {
+            setActiveSection(sectionId);
           }
-        });
-      },
-      { threshold: 0.3 }
-    );
+        }
+      });
+    }, observerOptions);
 
     const observeSections = () => {
-      document.querySelectorAll('section[id]').forEach((section) => {
+      const sections = document.querySelectorAll('section[id]');
+      sections.forEach((section) => {
+        observer.unobserve(section); // Avoid multiple observations
         observer.observe(section);
       });
     };
 
     observeSections();
-    // Rescan for lazy-loaded components
-    const timer = setTimeout(observeSections, 1500);
-    const timer2 = setTimeout(observeSections, 4000);
+
+    // Fallback for dynamic content and initial load
+    const refreshTimer = setTimeout(observeSections, 1000);
+    const refreshTimer2 = setTimeout(observeSections, 3000);
 
     return () => {
       observer.disconnect();
-      clearTimeout(timer);
-      clearTimeout(timer2);
+      clearTimeout(refreshTimer);
+      clearTimeout(refreshTimer2);
     };
   }, []);
 
@@ -115,8 +125,16 @@ export default function Navbar() {
                     }`}
                 >
                   {t(`nav.${item.key}`)}
-                  <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 transition-all duration-300 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)] ${isActive ? 'w-2/3' : 'w-0 group-hover:w-2/3'
-                    }`} />
+                  {isActive && (
+                    <motion.div
+                      layoutId="navUnderline"
+                      className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)] w-2/3"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  {!isActive && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500/50 transition-all duration-300 rounded-full w-0 group-hover:w-2/3" />
+                  )}
                 </motion.button>
               );
             })}
@@ -218,8 +236,8 @@ export default function Navbar() {
                     closed: { x: 20, opacity: 0 }
                   }}
                   onClick={() => scrollToSection(item.href)}
-                  className={`group w-full flex items-center justify-between p-4.5 rounded-2xl transition-all duration-300 ${isActive
-                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20 p-2'
+                  className={`group w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 ${isActive
+                    ? 'bg-blue-600 text-white shadow-xl shadow-blue-500/20'
                     : 'hover:bg-gray-100 dark:hover:bg-white/5'
                     }`}
                 >
