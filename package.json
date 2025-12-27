@@ -16,7 +16,7 @@
     "@vercel/analytics": "^1.6.1",
     "framer-motion": "^12.23.12",
     "i18next": "^25.4.2",
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-helmet-async": "^2.0.5",
