@@ -25,7 +25,7 @@ export default function Hero() {
       id="hero"
       itemScope
       itemType="https://schema.org/Person"
-      className="relative min-h-screen flex items-center justify-center pt-[170px] overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center pt-[150px] overflow-hidden"
     >
       {/* Dynamic Background Gradients */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-indigo-50/50 to-purple-50/50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-950 -z-20" />
