@@ -153,7 +153,7 @@ export default function Hero() {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-              className="relative"
+              className="relative overflow-hidden lg:overflow-visible p-4"
             >
               {/* Outer Decorative Rings */}
               <div className="absolute -inset-8 border border-blue-500/30 dark:border-blue-400/20 rounded-full animate-spin-slow -z-10" />

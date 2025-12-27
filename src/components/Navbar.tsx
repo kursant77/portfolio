@@ -2,22 +2,23 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
-import { Moon, Sun, Menu, X, Code } from 'lucide-react';
+import { Moon, Sun, Menu, X, Code, Home, User, Zap, Briefcase, Settings, MessageCircle, FileText, Mail, Globe } from 'lucide-react';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = React.useState('hero');
 
   const navItems = [
-    { key: 'home', href: '#hero' },
-    { key: 'about', href: '#about' },
-    { key: 'skills', href: '#skills' },
-    { key: 'projects', href: '#projects' },
-    { key: 'services', href: '#services' },
-    { key: 'faq', href: '#faq' },
-    { key: 'cv', href: '#cv' },
-    { key: 'contact', href: '#contact' }
+    { key: 'home', href: '#hero', icon: Home },
+    { key: 'about', href: '#about', icon: User },
+    { key: 'skills', href: '#skills', icon: Zap },
+    { key: 'projects', href: '#projects', icon: Briefcase },
+    { key: 'services', href: '#services', icon: Settings },
+    { key: 'faq', href: '#faq', icon: MessageCircle },
+    { key: 'cv', href: '#cv', icon: FileText },
+    { key: 'contact', href: '#contact', icon: Mail }
   ];
 
   const languages = [
@@ -26,10 +27,40 @@ export default function Navbar() {
     { code: 'ru', name: 'RU' }
   ];
 
+  // Intersection Observer to track active section
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    document.querySelectorAll('section[id]').forEach((section) => {
+      observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
+    const id = href.replace('#', '');
+    const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const offset = 80;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
     setIsMenuOpen(false);
   };
@@ -67,10 +98,14 @@ export default function Navbar() {
                 key={item.key}
                 whileHover={{ y: -2 }}
                 onClick={() => scrollToSection(item.href)}
-                className="px-3 py-1.5 text-[10px] xl:text-[11px] font-bold text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 uppercase tracking-wider relative group whitespace-nowrap"
+                className={`px-3 py-1.5 text-[11px] xl:text-[12px] font-bold transition-all duration-300 uppercase tracking-wider relative group whitespace-nowrap ${activeSection === item.href.replace('#', '')
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                  }`}
               >
                 {t(`nav.${item.key}`)}
-                <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-blue-500 group-hover:w-2/3 transition-all duration-300 rounded-full" />
+                <span className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 transition-all duration-300 rounded-full ${activeSection === item.href.replace('#', '') ? 'w-2/3' : 'w-0 group-hover:w-2/3'
+                  }`} />
               </motion.button>
             ))}
           </div>
@@ -78,7 +113,8 @@ export default function Navbar() {
           {/* Controls */}
           <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             {/* Language Selector */}
-            <div className="hidden sm:flex items-center bg-gray-100/50 dark:bg-gray-800/50 rounded-xl px-2">
+            <div className="hidden sm:flex items-center bg-gray-100/50 dark:bg-gray-800/50 rounded-xl px-2 border border-black/5 dark:border-white/5">
+              <Globe className="h-3 w-3 text-gray-500 mr-1" />
               <select
                 value={i18n.language}
                 onChange={(e) => i18n.changeLanguage(e.target.value)}
@@ -105,69 +141,127 @@ export default function Navbar() {
             {/* Mobile Menu Toggle */}
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 text-gray-700 dark:text-gray-300 z-[110]"
+              onClick={() => setIsMenuOpen(true)}
+              className="lg:hidden p-2 text-gray-700 dark:text-gray-300"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Menu className="h-6 w-6" />
             </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Full Screen Mobile Navigation */}
+      {/* Modern Mobile Navigation Overlay */}
       <motion.div
         initial={false}
         animate={isMenuOpen ? "open" : "closed"}
         variants={{
-          open: { clipPath: "circle(150% at 90% 40px)", transition: { type: "spring", stiffness: 20, restDelta: 2 } },
-          closed: { clipPath: "circle(0% at 90% 40px)", transition: { delay: 0.2, type: "spring", stiffness: 400, damping: 40 } }
+          open: { x: 0, opacity: 1, transition: { type: "spring", damping: 25, stiffness: 200 } },
+          closed: { x: "100%", opacity: 0, transition: { type: "spring", damping: 25, stiffness: 200 } }
         }}
-        className="fixed inset-0 bg-white dark:bg-gray-900 z-[105] lg:hidden overflow-hidden pointer-events-auto"
+        className="fixed inset-0 bg-gray-50 dark:bg-[#0a0f18] z-[105] lg:hidden overflow-y-auto pointer-events-auto flex flex-col"
       >
-        <div className="flex flex-col h-full justify-center items-center p-8 relative">
-
-          <div className="space-y-6 text-center">
-            {navItems.map((item, idx) => (
-              <motion.button
-                key={item.key}
-                variants={{
-                  open: { y: 0, opacity: 1, transition: { delay: 0.1 + idx * 0.05 } },
-                  closed: { y: 20, opacity: 0 }
-                }}
-                onClick={() => scrollToSection(item.href)}
-                className="block w-full text-3xl font-black text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors uppercase tracking-tighter"
-              >
-                {t(`nav.${item.key}`)}
-              </motion.button>
-            ))}
+        {/* Mobile Overlay Header */}
+        <div className="flex items-center justify-between px-6 py-6 border-b border-gray-200 dark:border-white/5 bg-white/50 dark:bg-gray-900/50 backdrop-blur-md sticky top-0 z-[110]">
+          <div className="flex items-center space-x-2">
+            <div className="p-1.5 bg-blue-600 rounded-lg shadow-lg">
+              <Code className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+              Asadbek<span className="text-blue-500">.</span>
+            </span>
           </div>
 
-          <motion.div
-            variants={{
-              open: { opacity: 1, y: 0, transition: { delay: 0.6 } },
-              closed: { opacity: 0, y: 20 }
-            }}
-            className="mt-16 flex flex-col items-center space-y-8"
-          >
-            <div className="flex space-x-8">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => i18n.changeLanguage(lang.code)}
-                  className={`text-lg font-bold ${i18n.language === lang.code ? 'text-blue-600' : 'text-gray-400'}`}
-                >
-                  {lang.name}
-                </button>
-              ))}
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg px-2 py-1">
+              <Globe className="h-4 w-4 text-gray-500 mr-2" />
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase">{i18n.language}</span>
             </div>
-
             <button
               onClick={toggleTheme}
-              className="flex items-center space-x-3 px-6 py-3 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300"
             >
-              {theme === 'light' ? <><Moon className="h-6 w-6" /> <span>Dark Mode</span></> : <><Sun className="h-6 w-6" /> <span>Light Mode</span></>}
+              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </button>
-          </motion.div>
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className="p-2 text-gray-500 dark:text-gray-400"
+            >
+              <X className="h-7 w-7" />
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu Content */}
+        <div className="flex-1 px-6 py-8 flex flex-col">
+          <div className="space-y-3">
+            {navItems.map((item, idx) => {
+              const Icon = item.icon;
+              const isActive = activeSection === item.href.replace('#', '');
+
+              return (
+                <motion.button
+                  key={item.key}
+                  variants={{
+                    open: { x: 0, opacity: 1, transition: { delay: idx * 0.05 } },
+                    closed: { x: 20, opacity: 0 }
+                  }}
+                  onClick={() => scrollToSection(item.href)}
+                  className={`group w-full flex items-center justify-between p-3 rounded-2xl transition-all duration-300 ${isActive
+                    ? 'bg-blue-600/10 dark:bg-blue-600/20 shadow-[0_0_20px_rgba(37,99,235,0.1)] border border-blue-600/20'
+                    : 'hover:bg-gray-100 dark:hover:bg-white/5 border border-transparent'
+                    }`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-2.5 rounded-xl transition-all duration-300 ${isActive
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+                      : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400 group-hover:bg-gray-300 dark:group-hover:bg-gray-700'
+                      }`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className={`text-base font-bold transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
+                      }`}>
+                      {t(`nav.${item.key}`)}
+                    </span>
+                  </div>
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeDot"
+                      className="w-2 h-2 rounded-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.8)]"
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+
+          <div className="mt-auto pt-10 pb-8 border-t border-gray-200 dark:border-white/5">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => scrollToSection('#contact')}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-xl shadow-blue-600/20 mb-8"
+            >
+              <Mail className="h-5 w-5" />
+              <span>{t('contact.title')}</span>
+            </motion.button>
+
+            <div className="flex flex-col items-center space-y-4">
+              <div className="flex space-x-6 text-gray-500 dark:text-gray-400">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => i18n.changeLanguage(lang.code)}
+                    className={`text-sm font-bold uppercase transition-colors ${i18n.language === lang.code ? 'text-blue-600 underline underline-offset-4' : 'hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                  >
+                    {lang.name}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-gray-400 dark:text-gray-600 uppercase tracking-widest font-medium">
+                © {new Date().getFullYear()} Asadbek Portfolio. All rights reserved.
+              </p>
+            </div>
+          </div>
         </div>
       </motion.div>
     </motion.nav>
