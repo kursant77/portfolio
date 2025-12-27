@@ -70,58 +70,58 @@ export default function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 1, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-[100] px-4 py-6 pointer-events-none"
+      className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-8 py-8 pointer-events-none"
     >
-      <div className="max-w-[95%] xl:max-w-7xl mx-auto pointer-events-auto">
-        <div className="bg-white/10 dark:bg-gray-900/40 backdrop-blur-xl border border-white/20 dark:border-gray-700/30 rounded-full shadow-[0_8px_32px_0_rgba(0,0,0,0.2)] px-4 md:px-8 py-2.5 flex justify-between items-center relative overflow-hidden">
+      <div className="max-w-[100%] xl:max-w-7xl mx-auto pointer-events-auto">
+        <div className="bg-white/10 dark:bg-[#0f172a]/40 backdrop-blur-2xl border border-white/30 dark:border-white/10 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] px-6 md:px-10 py-4 flex justify-between items-center relative overflow-hidden group/nav">
           {/* Decorative background pulse */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-purple-600/5 dark:from-blue-400/10 dark:to-purple-400/10 -z-10 animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-purple-600/10 opacity-0 group-hover/nav:opacity-100 transition-opacity duration-700 -z-10" />
 
           {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
             onClick={() => scrollToSection('#hero')}
-            className="flex items-center space-x-2.5 cursor-pointer group flex-shrink-0"
+            className="flex items-center space-x-3 cursor-pointer group flex-shrink-0"
           >
-            <div className="p-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg shadow-lg transform group-hover:rotate-12 transition-all duration-300">
-              <Code className="h-5 w-5 text-white" />
+            <div className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-xl transform group-hover:rotate-12 transition-all duration-300">
+              <Code className="h-6 w-6 text-white" />
             </div>
-            <span className="text-lg font-black text-gray-900 dark:text-white tracking-tighter whitespace-nowrap">
+            <span className="text-xl font-black text-gray-900 dark:text-white tracking-tighter whitespace-nowrap">
               ASADBEK<span className="text-blue-500">.</span>
             </span>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center justify-center space-x-1 xl:space-x-4 mx-4 overflow-hidden">
+          <div className="hidden lg:flex items-center justify-center space-x-2 xl:space-x-6 mx-4">
             {navItems.map((item) => (
               <motion.button
                 key={item.key}
                 whileHover={{ y: -2 }}
                 onClick={() => scrollToSection(item.href)}
-                className={`px-3 py-1.5 text-[11px] xl:text-[12px] font-bold transition-all duration-300 uppercase tracking-wider relative group whitespace-nowrap ${activeSection === item.href.replace('#', '')
+                className={`px-4 py-2 text-[13px] xl:text-[14px] font-black transition-all duration-300 uppercase tracking-[0.1em] relative group whitespace-nowrap ${activeSection === item.href.replace('#', '')
                   ? 'text-blue-600 dark:text-blue-400'
                   : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
               >
                 {t(`nav.${item.key}`)}
-                <span className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 transition-all duration-300 rounded-full ${activeSection === item.href.replace('#', '') ? 'w-2/3' : 'w-0 group-hover:w-2/3'
+                <span className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 bg-blue-500 transition-all duration-300 rounded-full shadow-[0_0_10px_rgba(37,99,235,0.8)] ${activeSection === item.href.replace('#', '') ? 'w-2/3' : 'w-0 group-hover:w-2/3'
                   }`} />
               </motion.button>
             ))}
           </div>
 
           {/* Controls */}
-          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
-            {/* Language Selector */}
-            <div className="hidden sm:flex items-center bg-gray-100/50 dark:bg-gray-800/50 rounded-xl px-2 border border-black/5 dark:border-white/5">
-              <Globe className="h-3 w-3 text-gray-500 mr-1" />
+          <div className="flex items-center space-x-3 md:space-x-5 flex-shrink-0">
+            {/* Language Selector - Visible on Desktop AND Mobile now */}
+            <div className="flex items-center bg-gray-100/30 dark:bg-gray-800/30 backdrop-blur-md rounded-2xl px-3 py-1.5 border border-white/20 dark:border-white/5 shadow-inner">
+              <Globe className="h-4 w-4 text-gray-500 mr-2" />
               <select
                 value={i18n.language}
                 onChange={(e) => i18n.changeLanguage(e.target.value)}
-                className="bg-transparent text-gray-700 dark:text-gray-300 border-none font-bold text-[10px] focus:ring-0 cursor-pointer hover:text-blue-500 transition-colors py-1"
+                className="bg-transparent text-gray-900 dark:text-white border-none font-black text-xs focus:ring-0 cursor-pointer hover:text-blue-500 transition-colors py-0.5 appearance-none pr-0"
               >
                 {languages.map((lang) => (
-                  <option key={lang.code} value={lang.code} className="bg-white dark:bg-gray-900">
+                  <option key={lang.code} value={lang.code} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                     {lang.name}
                   </option>
                 ))}
@@ -133,16 +133,16 @@ export default function Navbar() {
               whileHover={{ scale: 1.1, rotate: 15 }}
               whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-gray-100/50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 hover:shadow-md transition-all border border-black/5 dark:border-white/5"
+              className="p-3 rounded-2xl bg-gray-100/30 dark:bg-gray-800/30 text-gray-900 dark:text-white hover:shadow-2xl transition-all border border-white/20 dark:border-white/5 backdrop-blur-md"
             >
-              {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
             </motion.button>
 
             {/* Mobile Menu Toggle */}
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsMenuOpen(true)}
-              className="lg:hidden p-2 text-gray-700 dark:text-gray-300"
+              className="lg:hidden p-3 rounded-2xl bg-blue-600/10 text-blue-600 dark:text-blue-400 border border-blue-600/20"
             >
               <Menu className="h-6 w-6" />
             </motion.button>
