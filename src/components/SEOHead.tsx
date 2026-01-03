@@ -34,11 +34,10 @@ export default function SEOHead() {
         return s[titleKey] || s.title_uz;
     }).filter(Boolean).join(', ') || '';
 
-    const phone = contactInfo?.phone || '+998900033723';
-    const phone2 = '+998200093723';
-    const email = contactInfo?.email || 'kursant410@gmail.com';
-    const email2 = 'asadbekjumanazarov@gmail.com';
+    const phone = contactInfo?.phone || '+998200093723';
+    const email = contactInfo?.email || 'asadbekjumanazarov@gmail.com';
 
+    // Comprehensive keywords - Local SEO + Tech SEO
     // Comprehensive keywords - Local SEO + Tech SEO
     const localKeywords = [
         'shovot', 'xorazm', 'urganch', 'uzbekistan', 'xorazim viloyati', 'shovot tumani',
@@ -64,8 +63,8 @@ export default function SEOHead() {
     const personalKeywords = [
         'Asadbek Jumanazarov', 'Asadbek', 'Jumanazarov', 'Asadbek Jumanazarov portfolio',
         'kursant77', 'kursant410', 'asadbekjumanazarov', 'asadbek dev', 'asadbek programmer',
-        phone, phone.replace(/\s/g, ''), phone2, phone2.replace(/\s/g, ''),
-        email, email2, email.split('@')[0], email2.split('@')[0]
+        phone, phone.replace(/\s/g, ''),
+        email, email.split('@')[0]
     ];
 
     const keywords = [
@@ -79,7 +78,7 @@ export default function SEOHead() {
         'Work with me'
     ].filter(Boolean).join(', ');
 
-    const description = `${currentLanguage === 'uz' ? 'Xorazm viloyati Shovot tumanidan' : 'From Shovot, Khorezm'} - Asadbek Jumanazarov. Professional Full Stack Developer specializing in React, TypeScript, Node.js, and modern IT solutions. High-quality web development services in Uzbekistan. Contact: ${phone} | ${email}. Projects: ${projectNames.substring(0, 150)}. Site Sitelinks: Experience, Projects, Skills, Services, Contact.`;
+    const description = `Asadbek Jumanazarov - Professional Full Stack Developer specializing in React, TypeScript, Node.js, and modern IT solutions. High-quality web development services in Uzbekistan. Contact: ${phone} | ${email}. Projects: ${projectNames.substring(0, 150)}. Site Sitelinks: Experience, Projects, Skills, Services, Contact.`;
 
     return (
         <Helmet>

@@ -138,12 +138,7 @@ export function generatePersonSchema(
             'Node.js',
             'Full Stack Development',
             'Web Development',
-            'Backend Development',
-            'Supabase',
-            'PostgreSQL',
-            'Tailwind CSS',
-            'API Development',
-            'E-commerce Development'
+            'Tailwind CSS'
         ],
         address: {
             '@type': 'PostalAddress',
@@ -319,8 +314,16 @@ export function generateFAQSchema(aboutData?: AboutSection | null, currentLangua
         ],
         ru: [
             {
-                q: "Кто такой Асадбек Джуманазаров?",
-                a: aboutContent || "Асадбек Джуманазаров — профессиональный Full Stack разработчик из Шаватского района Хорезмской области, Узбекистан. Специализируется на React, TypeScript и Node.js."
+                q: "Что такое веб-разработка?",
+                a: "Веб-разработка — это процесс создания веб-сайтов и веб-приложений, включающий в себя как фронтенд (пользовательский интерфейс), так и бэкенд (серверную часть)."
+            },
+            {
+                q: "Какие технологии используются в веб-разработке?",
+                a: "В веб-разработке используется множество технологий, включая HTML, CSS, JavaScript, React, Node.js, TypeScript, Python, PHP, а также базы данных (например, PostgreSQL, MongoDB)."
+            },
+            {
+                q: "В чем разница между фронтендом и бэкендом?",
+                a: "Фронтенд — это часть веб-сайта, с которой пользователь непосредственно взаимодействует (видимая часть). Бэкенд — это часть веб-сайта, включающая сервер, базу данных и логику приложения, которая не видна пользователю."
             }
         ]
     };
